@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Página de Inicio</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #111; /* Dark black background */
+            background-color: #111; /* Fondo negro oscuro */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,9 +25,7 @@
             z-index: 1;
             background: url(https://i.imgur.com/NpVabvL.png);
             background-position: center;
-            background-size: 400px; /* Adjusted to less zoom */
-            background-repeat: no-repeat;
-            color: #fff;
+            background-size: 300px;
         }
 
         .container::before {
@@ -37,31 +35,18 @@
             left: -10px;
             right: -10px;
             bottom: -10px;
-            border: 5px solid #FFD700; /* Golden border */
+            border: 5px solid #FFD700; /* Borde dorado */
             border-radius: 15px;
             z-index: -1;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); /* Golden glow effect */
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); /* Efecto resplandeciente dorado */
         }
 
         h1 {
             margin-bottom: 20px;
-            color: #FFD700; /* Golden color for the title */
-            font-size: 48px;
+            color: #FFD700; /* Texto dorado */
+            font-size: 3em;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
-            background: linear-gradient(45deg, #FF6347, #FFD700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: -1000px 0;
-            }
-            100% {
-                background-position: 1000px 0;
-            }
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra de texto */
         }
 
         .button {
@@ -96,12 +81,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Dragon's Realm</h1>
+        <h1>Welcome</h1> <!-- Título traducido al inglés -->
         <a href="#" class="button"><span>Create Account</span></a>
-        <a href="#" class="button"><span>Sign In</span></a>
+        <a href="URL_DE_REDIRECCION" class="button"><span>Sign In</span></a> <!-- Actualiza la URL aquí -->
         <a href="#" class="button"><span>Contact</span></a>
         <a href="#" class="button"><span>Settings</span></a>
-        <a href="#" class="button"><span>Logout</span></a>
+        <a href="#" class="button"><span>Log Out</span></a>
     </div>
 </body>
 </html>
