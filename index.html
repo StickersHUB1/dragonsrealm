@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas del Jugador con Huevo de Dragón</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        .stats-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 10px;
+            width: 250px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 25px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #4caf50;
+            border-radius: 25px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+
+        .stat {
+            font-size: 16px;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        .title {
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #ff0000;
+            white-space: nowrap;
+        }
+
+        .notification-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .notification {
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .notification img {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Gradientes mágicos para las notificaciones */
+        .exp-notification {
+            background: linear-gradient(45deg, #f3ec78, #af4261);
+        }
+
+        .coin-notification {
+            background: linear-gradient(45deg, #f39c12, #d35400);
+        }
+
+        .title-notification {
+            background: linear-gradient(45deg, #8e44ad, #3498db);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        img {
+            width: 20px;
+            vertical-align: middle;
+        }
+
+        #huevo {
+            width: 150px;
+            height: auto;
+            cursor: pointer;
+            image-rendering: pixelated;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenedor de estadísticas del usuario -->
+    <div class="stats-container">
+        <div class="stat">Nivel: <span id="nivel">1</span></div>
+        <div class="stat">Experiencia: <span id="experiencia">0</span> / <span id="maxExp">100</span></div>
+        <div class="progress-container">
+            <div id="progressExp" class="progress-bar" style="width: 0%;">0%</div>
+        </div>
+        <div class="stat">Valor de cada click: <span id="valorClick">1</span></div>
+        <div class="stat">Monedas: <span id="monedas">0</span> Coins <img src="https://i.imgur.com/5MbUxQA.png" alt="Coin"></div>
+        <div class="title">Título: <span id="titulo">Ninguno</span></div>
+    </div>
+
+    <!-- Imagen del Huevo para Interacción -->
+    <img id="huevo" src="https://i.imgur.com/ad6PLfN.png" alt="Huevo de Dragón">
+
+    <!-- Contenedor para notificaciones -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script>
+        let nivel = 1;
+        let experiencia = 0;
+        let maxExp = 100;
+        let valorClick = 1;
+        let monedas = 0;
+        const clickExpBase = 5;
+
+        const nivelSpan = document.getElementById('nivel');
+        const experienciaSpan = document.getElementById('experiencia');
+        const maxExpSpan = document.getElementById('maxExp');
+        const progressExp = document.getElementById('progressExp');
+        const valorClickSpan = document.getElementById('valorClick');
+        const monedasSpan = document.getElementById('monedas');
+        const tituloSpan = document.getElementById('titulo');
+
+        const huevo = document.getElementById('huevo');
+        const notificationContainer = document.getElementById('notificationContainer');
+
+        // Lista de 50 títulos proporcionados, con colores distintos
+        const titulos = [
+            { nombre: "Novice Breeder", color: "hsl(0, 100%, 50%)" },
+            { nombre: "Dragon Hatchling Handler", color: "hsl(7, 100%, 50%)" },
+            { nombre: "Egg Whisperer", color: "hsl(14, 100%, 50%)" },
+            { nombre: "Young Dragon Tamer", color: "hsl(21, 100%, 50%)" },
+            { nombre: "Fledgling Dragonkeeper", color: "hsl(28, 100%, 50%)" },
+            { nombre: "Drake Enthusiast", color: "hsl(35, 100%, 50%)" },
+            { nombre: "Dragon Caregiver", color: "hsl(42, 100%, 50%)" },
+            { nombre: "Scale Collector", color: "hsl(49, 100%, 50%)" },
+            { nombre: "Wing Watcher", color: "hsl(56, 100%, 50%)" },
+            { nombre: "Hatchery Apprentice", color: "hsl(63, 100%, 50%)" },
+            { nombre: "Dragon Groomer", color: "hsl(70, 100%, 50%)" },
+            { nombre: "Junior Dragon Trainer", color: "hsl(77, 100%, 50%)" },
+            { nombre: "Firestarter", color: "hsl(84, 100%, 50%)" },
+            { nombre: "Scaled Guardian", color: "hsl(91, 100%, 50%)" },
+            { nombre: "Winged Apprentice", color: "hsl(98, 100%, 50%)" },
+            { nombre: "Inferno Initiate", color: "hsl(105, 100%, 50%)" },
+            { nombre: "Skybound Keeper", color: "hsl(112, 100%, 50%)" },
+            { nombre: "Draconic Scholar", color: "hsl(119, 100%, 50%)" },
+            { nombre: "Breeder Adept", color: "hsl(126, 100%, 50%)" },
+            { nombre: "Winged Companion", color: "hsl(133, 100%, 50%)" },
+            { nombre: "Elemental Master", color: "hsl(140, 100%, 50%)" },
+            { nombre: "Ancient Lore Seeker", color: "hsl(147, 100%, 50%)" },
+            { nombre: "Scalesmith", color: "hsl(154, 100%, 50%)" },
+            { nombre: "Flame Keeper", color: "hsl(161, 100%, 50%)" },
+            { nombre: "Dragonwright", color: "hsl(168, 100%, 50%)" },
+            { nombre: "Sky Sovereign", color: "hsl(175, 100%, 50%)" },
+            { nombre: "Brood Guardian", color: "hsl(182, 100%, 50%)" },
+            { nombre: "Inferno Adept", color: "hsl(189, 100%, 50%)" },
+            { nombre: "Flight Master", color: "hsl(196, 100%, 50%)" },
+            { nombre: "Scale Warden", color: "hsl(203, 100%, 50%)" },
+            { nombre: "High Dragon Tamer", color: "hsl(210, 100%, 50%)" },
+            { nombre: "Master of Flame", color: "hsl(217, 100%, 50%)" },
+            { nombre: "Elder Dragon Breeder", color: "hsl(224, 100%, 50%)" },
+            { nombre: "Broodmaster", color: "hsl(231, 100%, 50%)" },
+            { nombre: "Ancient Guardian", color: "hsl(238, 100%, 50%)" },
+            { nombre: "Mystic Dragonseer", color: "hsl(245, 100%, 50%)" },
+            { nombre: "Draconic Alchemist", color: "hsl(252, 100%, 50%)" },
+            { nombre: "Lord of Scales", color: "hsl(259, 100%, 50%)" },
+            { nombre: "Warden of Wings", color: "hsl(266, 100%, 50%)" },
+            { nombre: "Flame Emperor", color: "hsl(273, 100%, 50%)" },
+            { nombre: "Dragon Archmage", color: "hsl(280, 100%, 50%)" },
+            { nombre: "Scalemaster", color: "hsl(287, 100%, 50%)" },
+            { nombre: "Grand Broodmaster", color: "hsl(294, 100%, 50%)" },
+            { nombre: "Ancient Wyvernlord", color: "hsl(301, 100%, 50%)" },
+            { nombre: "High Dragon Lord", color: "hsl(308, 100%, 50%)" },
+            { nombre: "Elder Wyrmkeeper", color: "hsl(315, 100%, 50%)" },
+            { nombre: "Draconic Overlord", color: "hsl(322, 100%, 50%)" },
+            { nombre: "Supreme Dragonwright", color: "hsl(329, 100%, 50%)" },
+            { nombre: "Dragon King", color: "hsl(336, 100%, 50%)" },
+            { nombre: "Master of Dragons", color: "hsl(343, 100%, 50%)" }
+        ];
+
+        huevo.addEventListener('click', () => {
+            // Incrementa experiencia
+            const expPorClick = clickExpBase + (nivel - 1);
+            experiencia += expPorClick;
+
+            // Muestra notificación emergente
+            showNotification(`+${expPorClick} EXP`, 'exp-notification');
+
+            if (experiencia >= maxExp) {
+                experiencia -= maxExp;
+                nivelUp();
+            }
+
+            updateStats();
+        });
+
+        function updateStats() {
+            nivelSpan.textContent = nivel;
+            experienciaSpan.textContent = experiencia;
+            maxExpSpan.textContent = maxExp;
+            progressExp.style.width = (experiencia / maxExp) * 100 + '%';
+            progressExp.textContent = Math.round((experiencia / maxExp) * 100) + '%';
+            valorClickSpan.textContent = valorClick;
+            monedasSpan.textContent = monedas;
+
+            // Asigna título si el nivel es 5 o superior
+            if (nivel >= 5) {
+                const tituloIndex = Math.floor((nivel - 5) / 5);
+                const tituloActual = titulos[tituloIndex] || titulos[titulos.length - 1];
+                tituloSpan.textContent = tituloActual.nombre;
+                tituloSpan.style.color = tituloActual.color;
+            } else {
+                tituloSpan.textContent = "Ninguno";
+                tituloSpan.style.color = "#000";
+            }
+        }
+
+        function nivelUp() {
+            nivel++;
+            valorClick++;
+            maxExp = Math.floor(maxExp * 1.5); // Incrementa el máximo de exp necesario
+            const monedasGanadas = getRandomMonedas(nivel); // Recompensa aleatoria de monedas
+            monedas += monedasGanadas;
+            updateOrCreateNotification(`<img src="https://i.imgur.com/5MbUxQA.png" alt="Coin"> +${monedasGanadas} Coins`, 'coin-notification');
+
+            // Notificación de título si el jugador obtiene un nuevo título
+            if (nivel % 5 === 0) {
+                const tituloIndex = Math.floor((nivel - 5) / 5);
+                const tituloActual = titulos[tituloIndex];
+                updateOrCreateNotification(`Nuevo Título: ${tituloActual.nombre}`, 'title-notification');
+            }
+        }
+
+        function getRandomMonedas(nivel) {
+            return Math.floor(Math.random() * 3) + nivel; // Random entre nivel y nivel+2
+        }
+
+        function showNotification(message, className) {
+            const existingNotification = document.querySelector(`.${className}`);
+
+            if (existingNotification) {
+                // Actualiza la notificación existente si ya está presente
+                existingNotification.innerHTML = message;
+                existingNotification.style.opacity = '1';
+                existingNotification.style.transform = 'scale(1)';
+                existingNotification.style.animation = 'none';
+                existingNotification.offsetHeight; // trigger reflow
+                existingNotification.style.animation = 'pulse 0.6s ease-in-out';
+
+                clearTimeout(existingNotification.timeout);
+                existingNotification.timeout = setTimeout(() => {
+                    existingNotification.style.opacity = '0';
+                    setTimeout(() => {
+                        existingNotification.remove();
+                    }, 1000);
+                }, 3000);
+            } else {
+                // Crea una nueva notificación si no existe
+                const notification = document.createElement('div');
+                notification.className = `notification ${className}`;
+                notification.innerHTML = message;
+                notification.style.animation = 'pulse 0.6s ease-in-out';
+                notificationContainer.appendChild(notification);
+
+                notification.style.opacity = '1';
+
+                notification.timeout = setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 1000);
+                }, 3000);
+            }
+        }
+
+        function updateOrCreateNotification(message, className) {
+            const existingNotification = document.querySelector(`.${className}`);
+            if (existingNotification) {
+                // Actualiza la notificación existente si ya está presente
+                existingNotification.innerHTML = message;
+                existingNotification.style.opacity = '1';
+                clearTimeout(existingNotification.timeout);
+                existingNotification.timeout = setTimeout(() => {
+                    existingNotification.style.opacity = '0';
+                    setTimeout(() => {
+                        existingNotification.remove();
+                    }, 1000);
+                }, 3000);
+            } else {
+                // Crea una nueva notificación si no existe
+                const notification = document.createElement('div');
+                notification.className = `notification ${className}`;
+                notification.innerHTML = message;
+                notificationContainer.appendChild(notification);
+
+                notification.style.opacity = '1';
+
+                notification.timeout = setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 1000);
+                }, 3000);
+            }
+        }
+
+        // Inicializa las estadísticas
+        updateStats();
+    </script>
+</body>
+</html>
