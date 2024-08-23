@@ -100,20 +100,43 @@
 <body>
     <div class="container">
         <h1>Welcome to the Dragon's Realm</h1> <!-- Updated title -->
-        <a href="#" class="button"><span>Create Account</span></a>
-        <a href="https://stickershub1.github.io/dragonsrealm/game.html" class="button" onclick="fadeOut(event)"><span>Sign In</span></a> <!-- Updated URL -->
-        <a href="#" class="button"><span>Contact</span></a>
-        <a href="#" class="button"><span>Settings</span></a>
-        <a href="#" class="button"><span>Log Out</span></a>
+        <a href="#" class="button" id="createAccountButton"><span>Create Account</span></a>
+        <a href="https://stickershub1.github.io/dragonsrealm/game.html" class="button" id="signInButton"><span>Sign In</span></a>
+        <a href="#" class="button" id="contactButton"><span>Contact</span></a>
+        <a href="#" class="button" id="settingsButton"><span>Settings</span></a>
+        <a href="#" class="button" id="logOutButton"><span>Log Out</span></a>
     </div>
+
     <script>
-        function fadeOut(event) {
-            event.preventDefault(); // Prevent default link behavior
+        function fadeOut(event, url) {
+            event.preventDefault(); // Prevent the default link behavior
             document.body.style.opacity = 0; // Start fade-out transition
+
             setTimeout(() => {
-                window.location.href = event.currentTarget.href; // Redirect after fade-out
+                window.location.href = url; // Redirect after fade-out
             }, 500); // Time must match the CSS transition duration
         }
+
+        // Add event listeners to buttons
+        document.getElementById('createAccountButton').addEventListener('click', function(event) {
+            fadeOut(event, 'https://your-create-account-url.com'); // Replace with actual URL
+        });
+
+        document.getElementById('signInButton').addEventListener('click', function(event) {
+            fadeOut(event, 'https://stickershub1.github.io/dragonsrealm/game.html');
+        });
+
+        document.getElementById('contactButton').addEventListener('click', function(event) {
+            fadeOut(event, 'https://your-contact-url.com'); // Replace with actual URL
+        });
+
+        document.getElementById('settingsButton').addEventListener('click', function(event) {
+            fadeOut(event, 'https://your-settings-url.com'); // Replace with actual URL
+        });
+
+        document.getElementById('logOutButton').addEventListener('click', function(event) {
+            fadeOut(event, 'https://your-log-out-url.com'); // Replace with actual URL
+        });
     </script>
 </body>
 </html>
