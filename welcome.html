@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Inicio</title>
+    <title>Homepage</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #111; /* Fondo negro oscuro */
+            background-color: #111; /* Dark black background */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden; /* Prevent scrolling */
         }
 
         .container {
@@ -23,9 +24,9 @@
             text-align: center;
             position: relative;
             z-index: 1;
-            background: url(https://i.imgur.com/NpVabvL.png);
-            background-position: center;
-            background-size: 300px;
+            background: url(https://i.imgur.com/NpVabvL.png) center no-repeat;
+            background-size: 400px; /* Adjusted to less zoom */
+            color: #fff;
         }
 
         .container::before {
@@ -35,18 +36,31 @@
             left: -10px;
             right: -10px;
             bottom: -10px;
-            border: 5px solid #FFD700; /* Borde dorado */
+            border: 5px solid #FFD700; /* Golden border */
             border-radius: 15px;
             z-index: -1;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); /* Efecto resplandeciente dorado */
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); /* Golden glow effect */
         }
 
         h1 {
             margin-bottom: 20px;
-            color: #FFD700; /* Texto dorado */
+            color: #FFD700; /* Golden color for the title */
             font-size: 3em;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra de texto */
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
+            background: linear-gradient(45deg, #FF6347, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
         }
 
         .button {
@@ -81,9 +95,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome</h1> <!-- Título traducido al inglés -->
+        <h1>Welcome to the Dragon's Realm</h1> <!-- Updated title -->
         <a href="#" class="button"><span>Create Account</span></a>
-        <a href="URL_DE_REDIRECCION" class="button"><span>Sign In</span></a> <!-- Actualiza la URL aquí -->
+        <a href="https://example.com/signin" class="button"><span>Sign In</span></a> <!-- Update URL as needed -->
         <a href="#" class="button"><span>Contact</span></a>
         <a href="#" class="button"><span>Settings</span></a>
         <a href="#" class="button"><span>Log Out</span></a>
