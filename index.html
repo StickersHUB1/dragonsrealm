@@ -15,6 +15,8 @@
             align-items: center;
             height: 100vh;
             overflow: hidden; /* Prevent scrolling */
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
         }
 
         .container {
@@ -74,7 +76,7 @@
             border-radius: 5px;
             text-decoration: none;
             font-size: 16px;
-            transition: transform 0.3s;
+            transition: transform 0.3s, opacity 0.3s;
             position: relative;
             overflow: hidden;
         }
@@ -86,10 +88,12 @@
 
         .button:hover {
             transform: scale(1.05);
+            opacity: 0.9;
         }
 
         .button:active {
             transform: scale(0.95);
+            opacity: 1;
         }
     </style>
 </head>
@@ -97,10 +101,19 @@
     <div class="container">
         <h1>Welcome to the Dragon's Realm</h1> <!-- Updated title -->
         <a href="#" class="button"><span>Create Account</span></a>
-        <a href="https://stickershub1.github.io/dragonsrealm/game.html" class="button"><span>Sign In</span></a> <!-- Update URL as needed -->
+        <a href="https://stickershub1.github.io/dragonsrealm/game.html" class="button" onclick="fadeOut(event)"><span>Sign In</span></a> <!-- Updated URL -->
         <a href="#" class="button"><span>Contact</span></a>
         <a href="#" class="button"><span>Settings</span></a>
         <a href="#" class="button"><span>Log Out</span></a>
     </div>
+    <script>
+        function fadeOut(event) {
+            event.preventDefault(); // Prevent default link behavior
+            document.body.style.opacity = 0; // Start fade-out transition
+            setTimeout(() => {
+                window.location.href = event.currentTarget.href; // Redirect after fade-out
+            }, 500); // Time must match the CSS transition duration
+        }
+    </script>
 </body>
 </html>
