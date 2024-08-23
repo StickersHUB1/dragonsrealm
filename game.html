@@ -110,6 +110,18 @@
             }
         }
 
+        @keyframes float {
+            0% {
+                transform: translateY(-5px);
+            }
+            50% {
+                transform: translateY(5px);
+            }
+            100% {
+                transform: translateY(-5px);
+            }
+        }
+
         img {
             width: 20px;
             vertical-align: middle;
@@ -121,6 +133,17 @@
             cursor: pointer;
             image-rendering: pixelated;
             margin-top: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Estilo futuro para el dragón */
+        #dragon {
+            width: 200px;
+            height: auto;
+            cursor: pointer;
+            image-rendering: pixelated;
+            display: none; /* Oculto por defecto */
+            animation: float 3s ease-in-out infinite;
         }
     </style>
 </head>
@@ -139,6 +162,9 @@
 
     <!-- Imagen del Huevo para Interacción -->
     <img id="huevo" src="https://i.imgur.com/ad6PLfN.png" alt="Huevo de Dragón">
+
+    <!-- Imagen del Dragón (Oculta por defecto) -->
+    <img id="dragon" src="https://i.imgur.com/6p7AiXB.png" alt="Dragón">
 
     <!-- Contenedor para notificaciones -->
     <div class="notification-container" id="notificationContainer"></div>
@@ -160,61 +186,8 @@
         const tituloSpan = document.getElementById('titulo');
 
         const huevo = document.getElementById('huevo');
+        const dragon = document.getElementById('dragon');
         const notificationContainer = document.getElementById('notificationContainer');
-
-        // Lista de 50 títulos proporcionados, con colores distintos
-        const titulos = [
-            { nombre: "Novice Breeder", color: "hsl(0, 100%, 50%)" },
-            { nombre: "Dragon Hatchling Handler", color: "hsl(7, 100%, 50%)" },
-            { nombre: "Egg Whisperer", color: "hsl(14, 100%, 50%)" },
-            { nombre: "Young Dragon Tamer", color: "hsl(21, 100%, 50%)" },
-            { nombre: "Fledgling Dragonkeeper", color: "hsl(28, 100%, 50%)" },
-            { nombre: "Drake Enthusiast", color: "hsl(35, 100%, 50%)" },
-            { nombre: "Dragon Caregiver", color: "hsl(42, 100%, 50%)" },
-            { nombre: "Scale Collector", color: "hsl(49, 100%, 50%)" },
-            { nombre: "Wing Watcher", color: "hsl(56, 100%, 50%)" },
-            { nombre: "Hatchery Apprentice", color: "hsl(63, 100%, 50%)" },
-            { nombre: "Dragon Groomer", color: "hsl(70, 100%, 50%)" },
-            { nombre: "Junior Dragon Trainer", color: "hsl(77, 100%, 50%)" },
-            { nombre: "Firestarter", color: "hsl(84, 100%, 50%)" },
-            { nombre: "Scaled Guardian", color: "hsl(91, 100%, 50%)" },
-            { nombre: "Winged Apprentice", color: "hsl(98, 100%, 50%)" },
-            { nombre: "Inferno Initiate", color: "hsl(105, 100%, 50%)" },
-            { nombre: "Skybound Keeper", color: "hsl(112, 100%, 50%)" },
-            { nombre: "Draconic Scholar", color: "hsl(119, 100%, 50%)" },
-            { nombre: "Breeder Adept", color: "hsl(126, 100%, 50%)" },
-            { nombre: "Winged Companion", color: "hsl(133, 100%, 50%)" },
-            { nombre: "Elemental Master", color: "hsl(140, 100%, 50%)" },
-            { nombre: "Ancient Lore Seeker", color: "hsl(147, 100%, 50%)" },
-            { nombre: "Scalesmith", color: "hsl(154, 100%, 50%)" },
-            { nombre: "Flame Keeper", color: "hsl(161, 100%, 50%)" },
-            { nombre: "Dragonwright", color: "hsl(168, 100%, 50%)" },
-            { nombre: "Sky Sovereign", color: "hsl(175, 100%, 50%)" },
-            { nombre: "Brood Guardian", color: "hsl(182, 100%, 50%)" },
-            { nombre: "Inferno Adept", color: "hsl(189, 100%, 50%)" },
-            { nombre: "Flight Master", color: "hsl(196, 100%, 50%)" },
-            { nombre: "Scale Warden", color: "hsl(203, 100%, 50%)" },
-            { nombre: "High Dragon Tamer", color: "hsl(210, 100%, 50%)" },
-            { nombre: "Master of Flame", color: "hsl(217, 100%, 50%)" },
-            { nombre: "Elder Dragon Breeder", color: "hsl(224, 100%, 50%)" },
-            { nombre: "Broodmaster", color: "hsl(231, 100%, 50%)" },
-            { nombre: "Ancient Guardian", color: "hsl(238, 100%, 50%)" },
-            { nombre: "Mystic Dragonseer", color: "hsl(245, 100%, 50%)" },
-            { nombre: "Draconic Alchemist", color: "hsl(252, 100%, 50%)" },
-            { nombre: "Lord of Scales", color: "hsl(259, 100%, 50%)" },
-            { nombre: "Warden of Wings", color: "hsl(266, 100%, 50%)" },
-            { nombre: "Flame Emperor", color: "hsl(273, 100%, 50%)" },
-            { nombre: "Dragon Archmage", color: "hsl(280, 100%, 50%)" },
-            { nombre: "Scalemaster", color: "hsl(287, 100%, 50%)" },
-            { nombre: "Grand Broodmaster", color: "hsl(294, 100%, 50%)" },
-            { nombre: "Ancient Wyvernlord", color: "hsl(301, 100%, 50%)" },
-            { nombre: "High Dragon Lord", color: "hsl(308, 100%, 50%)" },
-            { nombre: "Elder Wyrmkeeper", color: "hsl(315, 100%, 50%)" },
-            { nombre: "Draconic Overlord", color: "hsl(322, 100%, 50%)" },
-            { nombre: "Supreme Dragonwright", color: "hsl(329, 100%, 50%)" },
-            { nombre: "Dragon King", color: "hsl(336, 100%, 50%)" },
-            { nombre: "Master of Dragons", color: "hsl(343, 100%, 50%)" }
-        ];
 
         huevo.addEventListener('click', () => {
             // Incrementa experiencia
@@ -266,6 +239,11 @@
                 const tituloIndex = Math.floor((nivel - 5) / 5);
                 const tituloActual = titulos[tituloIndex];
                 updateOrCreateNotification(`Nuevo Título: ${tituloActual.nombre}`, 'title-notification');
+            }
+
+            // Muestra el dragón cuando el jugador alcance un nivel específico (ejemplo: nivel 10)
+            if (nivel === 10) {
+                dragon.style.display = 'block';
             }
         }
 
