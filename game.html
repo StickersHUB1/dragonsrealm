@@ -52,6 +52,8 @@
             cursor: pointer;
             image-rendering: pixelated;
             animation: float 3s ease-in-out infinite;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
         }
 
         .progress-container {
@@ -92,20 +94,6 @@
             text-overflow: ellipsis;
             position: relative;
             margin-bottom: 15px;
-        }
-
-        .title.marquee {
-            animation: marquee 10s linear infinite;
-        }
-
-        @keyframes marquee {
-            from {
-                left: 100%;
-            }
-
-            to {
-                left: -100%;
-            }
         }
 
         .notification-container {
@@ -178,26 +166,6 @@
 
             100% {
                 transform: translate(-50%, -50%);
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
             }
         }
 
@@ -356,13 +324,13 @@
     <div id="user-stats-container" class="container">
         <h2>User Stats</h2>
         <div id="user-stats">
-            <div class="title">Title: <span id="titulo" class="marquee">None</span></div>
+            <div class="title">Title: <span id="titulo">None</span></div>
             <div class="stat">Level: <span id="nivelUsuario">1</span></div>
             <div class="stat">Exp: <span id="experiencia">0</span> / <span id="maxExp">100</span></div>
             <div class="progress-container">
                 <div id="progressExp" class="progress-bar" style="width: 0%;">0%</div>
             </div>
-            <div class="stat">Click Value: <span id="valorClick">1</span></div>
+            <div class="stat">Click Value: <span id="valorClick">1</span><span id="bonusClick"></span></div>
             <div class="stat">Coins: <span id="monedas">0</span><img src="https://i.imgur.com/5MbUxQA.png" alt="Coin"
                     style="width: 16px;"></div>
         </div>
@@ -400,8 +368,7 @@
     <!-- Egg Image for Interaction -->
     <img id="huevo" src="https://i.imgur.com/ad6PLfN.png" alt="Dragon Egg">
     <img id="dragon" src="https://i.imgur.com/XaPR5kU.png" alt="Dragon" style="display:none;">
-    <img id="hatching-gif" src="https://i.imgur.com/m0qlZ0a.gif" alt="Hatching Animation"
-        style="display: none;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1000;width: 300px;height: auto;">
+    <img id="hatching-gif" src="https://i.imgur.com/m0qlZ0a.gif" alt="Hatching Animation" style="display: none;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1000;width: 300px;height: auto;">
     <img id="crash-effect" src="https://i.imgur.com/5cZw0i6.png" alt="CRASH"
         style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:200px; z-index: 1000;">
 
@@ -446,12 +413,13 @@
         let userLevel = 1;
         let experience = 0;
         let maxExperience = 100;
-        let clickValue = 1;
+        let baseClickValue = userLevel; 
+        let clickBonus = 0;
         let coins = 0;
         const clickExpBase = 5;
 
         let eggProgress = 0;
-        const eggClicksNeeded = 10;
+        const eggClicksNeeded = 100;
 
         let dragonLevel = 1;
         let dragonProgress = 0;
@@ -462,6 +430,7 @@
         const maxExperienceSpan = document.getElementById('maxExp');
         const progressExp = document.getElementById('progressExp');
         const clickValueSpan = document.getElementById('valorClick');
+        const bonusClickSpan = document.getElementById('bonusClick');
         const coinsSpan = document.getElementById('monedas');
         const titleSpan = document.getElementById('titulo');
 
@@ -524,7 +493,7 @@
             const expPerClick = clickExpBase + (userLevel - 1);
             experience += expPerClick;
 
-            eggProgress += clickValue;
+            eggProgress += baseClickValue + clickBonus;
 
             showNotification(`+${expPerClick} EXP`, 'exp-notification');
             showClickEffect(egg);
@@ -547,7 +516,7 @@
             const expPerClick = clickExpBase + (userLevel - 1);
             experience += expPerClick;
 
-            dragonProgress += clickValue;
+            dragonProgress += baseClickValue + clickBonus;
 
             showNotification(`+${expPerClick} EXP`, 'exp-notification');
             showClickEffect(dragon);
@@ -592,94 +561,93 @@
         }
 
         function hatchEgg() {
-            // Fade out del huevo
-            egg.style.animation = 'fadeOut 1s forwards';
-            egg.addEventListener('animationend', () => {
+            const type = types[Math.floor(Math.random() * types.length)];
+            const nature = natures[Math.floor(Math.random() * natures.length)];
+            const gender = genders[Math.floor(Math.random() * genders.length)];
+            const power = Math.floor(Math.random() * 3) + 1;
+            const vitality = Math.floor(Math.random() * 3) + 1;
+
+            document.getElementById('tipoDragon').textContent = type;
+            document.getElementById('naturalezaDragon').textContent = nature;
+            document.getElementById('sexoDragon').textContent = gender;
+            document.getElementById('poderDragon').textContent = power;
+            document.getElementById('vitalidadDragon').textContent = vitality;
+
+            dragon.src = dragonImages[type];
+
+            fadeOut(egg, 1000, () => {
                 egg.style.display = 'none';
+                fadeIn(crashEffect, 1000, () => {
+                    setTimeout(() => {
+                        fadeOut(crashEffect, 1000, () => {
+                            crashEffect.style.display = 'none';
+                            fadeIn(hatchingGif, 1000, () => {
+                                setTimeout(() => {
+                                    fadeOut(hatchingGif, 1000, () => {
+                                        hatchingGif.style.display = 'none';
+                                        fadeIn(dragon, 1000, () => {
+                                            eggStats.style.display = 'none';
+                                            dragonStats.style.display = 'block';
 
-                // Mostrar "CRASH" con fade in
-                crashEffect.style.display = 'block';
-                crashEffect.style.animation = 'fadeIn 1s forwards';
+                                            document.querySelector("#egg-dragon-stats-container h2").textContent = "Dragon Stats";
 
-                setTimeout(() => {
-                    // Fade out de "CRASH"
-                    crashEffect.style.animation = 'fadeOut 1s forwards';
-                    crashEffect.addEventListener('animationend', () => {
-                        crashEffect.style.display = 'none';
-
-                        // Mostrar la animación del huevo abriéndose con fade in
-                        hatchingGif.style.display = 'block';
-                        hatchingGif.style.animation = 'fadeIn 1s forwards';
-
-                        setTimeout(() => {
-                            // Fade out de la animación
-                            hatchingGif.style.animation = 'fadeOut 1s forwards';
-                            hatchingGif.addEventListener('animationend', () => {
-                                hatchingGif.style.display = 'none';
-
-                                // Mostrar el dragón con fade in
-                                dragon.style.display = 'block';
-                                dragon.style.animation = 'fadeIn 1s forwards';
-                                eggStats.style.display = 'none';
-                                dragonStats.style.display = 'block';
-
-                                document.querySelector("#egg-dragon-stats-container h2").textContent = "Dragon Stats";
-
-                                let type = types[Math.floor(Math.random() * types.length)];
-                                let nature = natures[Math.floor(Math.random() * natures.length)];
-                                let gender = genders[Math.floor(Math.random() * genders.length)];
-                                let power = Math.floor(Math.random() * 3) + 1;
-                                let vitality = Math.floor(Math.random() * 3) + 1;
-
-                                document.getElementById('tipoDragon').textContent = type;
-                                document.getElementById('naturalezaDragon').textContent = nature;
-                                document.getElementById('sexoDragon').textContent = gender;
-                                document.getElementById('poderDragon').textContent = power;
-                                document.getElementById('vitalidadDragon').textContent = vitality;
-
-                                dragon.src = dragonImages[type];
-
-                                inventory[currentEggOrDragon.index] = {
-                                    type: 'dragon',
-                                    level: 1,
-                                    rarity: 'Basic',
-                                    type: type,
-                                    nature: nature,
-                                    gender: gender,
-                                    power: power,
-                                    vitality: vitality
-                                };
-                                dragonProgress = 0;
-                                updateDragonProgress();
-                                renderInventory();
+                                            inventory[currentEggOrDragon.index] = {
+                                                type: 'dragon',
+                                                level: 1,
+                                                rarity: 'Basic',
+                                                type: type,
+                                                nature: nature,
+                                                gender: gender,
+                                                power: power,
+                                                vitality: vitality
+                                            };
+                                            dragonProgress = 0;
+                                            updateDragonProgress();
+                                            renderInventory();
+                                        });
+                                    });
+                                }, 2000); // Duración de la animación del GIF (2 segundos)
                             });
-                        }, 2000); // Duración de la animación del GIF (2 segundos)
-                    });
-                }, 1000); // Duración de la imagen "CRASH"
+                        });
+                    }, 1000); // Duración de la imagen "CRASH"
+                });
             });
+        }
+
+        function fadeOut(element, duration, callback) {
+            element.style.transition = `opacity ${duration}ms ease-in-out`;
+            element.style.opacity = 0;
+            setTimeout(callback, duration);
+        }
+
+        function fadeIn(element, duration, callback) {
+            element.style.display = 'block';
+            element.style.transition = `opacity ${duration}ms ease-in-out`;
+            element.style.opacity = 1;
+            setTimeout(callback, duration);
         }
 
         function levelUpUser() {
             userLevel++;
+            baseClickValue = userLevel;
             maxExperience = Math.floor(maxExperience * 1.5);
-
-            const currentTitle = titles.find(title => userLevel === title.level);
-
-            if (currentTitle) {
-                clickValue = currentTitle.clickBonus;
-                titleSpan.textContent = currentTitle.name;
-                titleSpan.style.color = currentTitle.color;
-                updateOrCreateNotification(`New Title: ${currentTitle.name}`, 'title-notification');
-            } else {
-                clickValue++;
-            }
-
             const coinsEarned = getRandomCoins(userLevel);
             coins += coinsEarned;
             updateOrCreateNotification(`<img src="https://i.imgur.com/5MbUxQA.png" alt="Coin"> +${formatCoins(coinsEarned)} Coins`, 'coin-notification');
             updateOrCreateNotification(`You've reached level ${userLevel}!`, 'level-notification');
 
+            checkForTitleUpgrade();
             updateStats();
+        }
+
+        function checkForTitleUpgrade() {
+            const currentTitle = titles.find(title => userLevel >= title.level);
+            if (currentTitle) {
+                titleSpan.textContent = currentTitle.name;
+                titleSpan.style.color = currentTitle.color;
+                clickBonus = currentTitle.clickBonus;
+                updateOrCreateNotification(`New Title: ${currentTitle.name}`, 'title-notification');
+            }
         }
 
         function levelUpDragon() {
@@ -818,9 +786,9 @@
             currentEggOrDragon = { type: item.type, index };
 
             if (item.type === 'egg') {
-                openModal('eggOptionsModal'); // Abrir modal con opciones
+                openModal('eggOptionsModal');
             } else if (item.type === 'dragon') {
-                openModal('dragonOptionsModal'); // Abrir modal con opciones
+                openModal('dragonOptionsModal');
             }
         }
 
@@ -899,7 +867,7 @@
 
         function openInventoryModal() {
             inventoryModal.style.display = 'flex';
-            renderInventory(); // Actualiza el inventario cuando se abre el modal
+            renderInventory();
         }
 
         function closeInventoryModal() {
@@ -914,27 +882,19 @@
             maxExperienceSpan.textContent = maxExperience;
             progressExp.style.width = (experience / maxExperience) * 100 + '%';
             progressExp.textContent = `${Math.round((experience / maxExperience) * 100)}%`;
-            clickValueSpan.textContent = clickValue;
+            clickValueSpan.textContent = baseClickValue;
+            bonusClickSpan.textContent = clickBonus ? ` + ${clickBonus}` : '';
+            bonusClickSpan.style.color = titleSpan.style.color;
             coinsSpan.textContent = formatCoins(coins);
-
-            const currentTitle = titles.find(title => userLevel >= title.level) || { name: "None", color: "#000" };
-            titleSpan.textContent = currentTitle.name;
-            titleSpan.style.color = currentTitle.color;
         }
-
-        updateStats();
-        renderInventory();
 
         function showClickEffect(target) {
             const clickImg = document.createElement('img');
             clickImg.src = 'https://i.imgur.com/CB9ycnj.png';
             clickImg.className = 'click-effect';
 
-            // Posición aleatoria alrededor del objetivo
-            const offsetX = Math.random() * 100 - 50; // Rango de -50 a 50
-            const offsetY = Math.random() * 100 - 50; // Rango de -50 a 50
-
-            // Obtener la posición del objetivo
+            const offsetX = Math.random() * 100 - 50;
+            const offsetY = Math.random() * 100 - 50;
             const rect = target.getBoundingClientRect();
 
             clickImg.style.left = `${rect.left + rect.width / 2 + offsetX}px`;
@@ -942,11 +902,13 @@
 
             document.body.appendChild(clickImg);
 
-            // Eliminar el elemento después de la animación
             setTimeout(() => {
                 clickImg.remove();
             }, 1000);
         }
+
+        updateStats();
+        renderInventory();
     </script>
 </body>
 
