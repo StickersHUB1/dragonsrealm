@@ -83,15 +83,15 @@
         }
 
         .title {
-    font-size: 10px;
-    margin-top: 10px;
-    font-weight: bold;
-    color: #f39c12;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-    margin-bottom: 15px;
+            font-size: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #f39c12;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            margin-bottom: 15px;
         }
 
         .title.marquee {
@@ -181,6 +181,26 @@
             }
         }
 
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
         #inventory-button {
             position: absolute;
             bottom: 10px;
@@ -228,6 +248,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            cursor: pointer;
         }
 
         .inventory-slot img {
@@ -257,6 +278,74 @@
             font-size: 24px;
             cursor: pointer;
             color: white;
+        }
+
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #ff8c00;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .option-button:hover {
+            background-color: #ff4500;
+        }
+
+        .modal-content {
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .click-effect {
+            position: absolute;
+            width: 50px;
+            animation: fadeInOut 1s ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
         }
     </style>
 </head>
@@ -296,21 +385,25 @@
 
         <div id="dragon-stats" style="display: none;">
             <div class="stat">Level: <span id="nivelDragon">1</span></div>
+            <div class="progress-container">
+                <div id="progressDragon" class="progress-bar" style="width: 0%;">0%</div>
+            </div>
             <div class="stat">Rarity: Basic</div>
             <div class="stat">Type: <span id="tipoDragon">???</span></div>
             <div class="stat">Power: <span id="poderDragon">1</span></div>
             <div class="stat">Nature: <span id="naturalezaDragon">???</span></div>
             <div class="stat">Gender: <span id="sexoDragon">???</span></div>
             <div class="stat">Vitality: <span id="vitalidadDragon">1</span></div>
-            <div class="progress-container">
-                <div id="progressDragon" class="progress-bar" style="width: 0%;">0%</div>
-            </div>
         </div>
     </div>
 
     <!-- Egg Image for Interaction -->
     <img id="huevo" src="https://i.imgur.com/ad6PLfN.png" alt="Dragon Egg">
     <img id="dragon" src="https://i.imgur.com/XaPR5kU.png" alt="Dragon" style="display:none;">
+    <img id="hatching-gif" src="https://i.imgur.com/m0qlZ0a.gif" alt="Hatching Animation"
+        style="display: none;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1000;width: 300px;height: auto;">
+    <img id="crash-effect" src="https://i.imgur.com/5cZw0i6.png" alt="CRASH"
+        style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:200px; z-index: 1000;">
 
     <!-- Inventory Button -->
     <button id="inventory-button">Inventory</button>
@@ -319,6 +412,31 @@
     <div id="inventory-modal">
         <div id="inventory-container"></div>
         <span class="modal-close" onclick="closeInventoryModal()">✖</span>
+    </div>
+
+    <!-- Option Modals -->
+    <div id="incubateModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to incubate this egg?</p>
+            <button onclick="confirmIncubate()">Yes</button>
+            <button onclick="closeModal('incubateModal')">No</button>
+        </div>
+    </div>
+
+    <div id="sacrificeModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to sacrifice this egg for EXP?</p>
+            <button onclick="confirmSacrifice()">Yes</button>
+            <button onclick="closeModal('sacrificeModal')">No</button>
+        </div>
+    </div>
+
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to withdraw this item from the incubator?</p>
+            <button onclick="withdrawItem(currentEggOrDragon.index)" class="option-button">Yes</button>
+            <button onclick="closeModal('withdrawModal')" class="option-button">No</button>
+        </div>
     </div>
 
     <!-- Notification Container -->
@@ -349,6 +467,8 @@
 
         const egg = document.getElementById('huevo');
         const dragon = document.getElementById('dragon');
+        const hatchingGif = document.getElementById('hatching-gif');
+        const crashEffect = document.getElementById('crash-effect');
         const notificationContainer = document.getElementById('notificationContainer');
 
         const eggStats = document.getElementById('egg-stats');
@@ -365,15 +485,38 @@
         let currentEggOrDragon = null;
 
         const titles = [
-            { name: "Recruit Breeder", color: "hsl(0, 100%, 50%)" },
-            { name: "Young Tamer", color: "hsl(7, 100%, 50%)" },
-            { name: "Wyrmling Keeper", color: "hsl(14, 100%, 50%)" },
-            // Continúa con los títulos restantes...
+            { name: "Recruit Breeder", level: 5, clickBonus: 5, color: "hsl(0, 100%, 50%)" },
+            { name: "Young Tamer", level: 10, clickBonus: 10, color: "hsl(7, 100%, 50%)" },
+            { name: "Wyrmling Keeper", level: 15, clickBonus: 15, color: "hsl(14, 100%, 50%)" },
+            { name: "Scale Squire", level: 20, clickBonus: 20, color: "hsl(21, 100%, 50%)" },
+            { name: "Flame Tamer", level: 25, clickBonus: 25, color: "hsl(28, 100%, 50%)" },
+            { name: "Dragon Rider", level: 30, clickBonus: 30, color: "hsl(35, 100%, 50%)" },
+            { name: "Breeder Adept", level: 35, clickBonus: 35, color: "hsl(42, 100%, 50%)" },
+            { name: "Sky Guardian", level: 40, clickBonus: 40, color: "hsl(49, 100%, 50%)" },
+            { name: "Scale Connoisseur", level: 45, clickBonus: 45, color: "hsl(56, 100%, 50%)" },
+            { name: "Lore Seeker", level: 50, clickBonus: 50, color: "hsl(63, 100%, 50%)" },
+            { name: "Wyrm Breeder", level: 55, clickBonus: 55, color: "hsl(70, 100%, 50%)" },
+            { name: "Elder Keeper", level: 60, clickBonus: 60, color: "hsl(77, 100%, 50%)" },
+            { name: "Drake Seer", level: 65, clickBonus: 65, color: "hsl(84, 100%, 50%)" },
+            { name: "Dragon Master", level: 70, clickBonus: 70, color: "hsl(91, 100%, 50%)" },
+            { name: "Wyrm Warden", level: 75, clickBonus: 75, color: "hsl(98, 100%, 50%)" },
+            { name: "Storm Lord", level: 80, clickBonus: 80, color: "hsl(105, 100%, 50%)" },
+            { name: "Fire Warden", level: 85, clickBonus: 85, color: "hsl(112, 100%, 50%)" },
+            { name: "Celestial Rider", level: 90, clickBonus: 90, color: "hsl(119, 100%, 50%)" },
+            { name: "Dragon Lord", level: 95, clickBonus: 95, color: "hsl(126, 100%, 50%)" },
+            { name: "Master of Dragons", level: 100, clickBonus: 100, color: "hsl(133, 100%, 50%)" }
         ];
 
-        const types = ["Flama", "Freez", "Wind", "Electro"];
-        const natures = ["Maligna", "Divina"];
-        const genders = ["Macho", "Hembra"];
+        const types = ["Flama", "Electro", "Freez", "Wind"];
+        const natures = ["Malignant", "Divine"];
+        const genders = ["Male", "Female"];
+
+        const dragonImages = {
+            "Flama": "https://i.imgur.com/S0qMZRp.png",
+            "Electro": "https://i.imgur.com/L6PVNVJ.png",
+            "Freez": "https://i.imgur.com/pdwYzy6.png",
+            "Wind": "https://i.imgur.com/XaPR5kU.png"
+        };
 
         inventory.push({ type: 'egg', progress: 0, rarity: 'Basic' });
 
@@ -384,6 +527,7 @@
             eggProgress += clickValue;
 
             showNotification(`+${expPerClick} EXP`, 'exp-notification');
+            showClickEffect(egg);
 
             if (experience >= maxExperience) {
                 experience -= maxExperience;
@@ -406,6 +550,7 @@
             dragonProgress += clickValue;
 
             showNotification(`+${expPerClick} EXP`, 'exp-notification');
+            showClickEffect(dragon);
 
             if (experience >= maxExperience) {
                 experience -= maxExperience;
@@ -426,6 +571,11 @@
             progressEgg.style.width = `${percentage}%`;
             progressEgg.textContent = `${Math.round(percentage)}%`;
 
+            if (inventory[currentEggOrDragon?.index]?.type === 'egg') {
+                inventory[currentEggOrDragon.index].progress = Math.round(percentage);
+                renderInventory();
+            }
+
             if (percentage >= 25 && percentage < 50) {
                 showNotification("The egg is cracking!", 'egg-notification');
             } else if (percentage >= 50 && percentage < 75) {
@@ -442,57 +592,92 @@
         }
 
         function hatchEgg() {
-            showNotification("Congratulations, your egg has hatched!", 'egg-notification');
-            egg.style.display = 'none';
-            dragon.style.display = 'block';
-            eggStats.style.display = 'none';
-            dragonStats.style.display = 'block';
+            // Fade out del huevo
+            egg.style.animation = 'fadeOut 1s forwards';
+            egg.addEventListener('animationend', () => {
+                egg.style.display = 'none';
 
-            document.querySelector("#egg-dragon-stats-container h2").textContent = "Dragon Stats";
+                // Mostrar "CRASH" con fade in
+                crashEffect.style.display = 'block';
+                crashEffect.style.animation = 'fadeIn 1s forwards';
 
-            let type = types[Math.floor(Math.random() * types.length)];
-            let nature = natures[Math.floor(Math.random() * natures.length)];
-            let gender = genders[Math.floor(Math.random() * genders.length)];
-            let power = Math.floor(Math.random() * 3) + 1;
-            let vitality = Math.floor(Math.random() * 3) + 1;
+                setTimeout(() => {
+                    // Fade out de "CRASH"
+                    crashEffect.style.animation = 'fadeOut 1s forwards';
+                    crashEffect.addEventListener('animationend', () => {
+                        crashEffect.style.display = 'none';
 
-            document.getElementById('tipoDragon').textContent = type;
-            document.getElementById('naturalezaDragon').textContent = nature;
-            document.getElementById('sexoDragon').textContent = gender;
-            document.getElementById('poderDragon').textContent = power;
-            document.getElementById('vitalidadDragon').textContent = vitality;
+                        // Mostrar la animación del huevo abriéndose con fade in
+                        hatchingGif.style.display = 'block';
+                        hatchingGif.style.animation = 'fadeIn 1s forwards';
 
-            inventory[currentEggOrDragon.index] = {
-                type: 'dragon',
-                level: 1,
-                rarity: 'Basic',
-                type: type,
-                nature: nature,
-                gender: gender,
-                power: power,
-                vitality: vitality
-            };
-            dragonProgress = 0;
-            updateDragonProgress();
-            renderInventory();
+                        setTimeout(() => {
+                            // Fade out de la animación
+                            hatchingGif.style.animation = 'fadeOut 1s forwards';
+                            hatchingGif.addEventListener('animationend', () => {
+                                hatchingGif.style.display = 'none';
+
+                                // Mostrar el dragón con fade in
+                                dragon.style.display = 'block';
+                                dragon.style.animation = 'fadeIn 1s forwards';
+                                eggStats.style.display = 'none';
+                                dragonStats.style.display = 'block';
+
+                                document.querySelector("#egg-dragon-stats-container h2").textContent = "Dragon Stats";
+
+                                let type = types[Math.floor(Math.random() * types.length)];
+                                let nature = natures[Math.floor(Math.random() * natures.length)];
+                                let gender = genders[Math.floor(Math.random() * genders.length)];
+                                let power = Math.floor(Math.random() * 3) + 1;
+                                let vitality = Math.floor(Math.random() * 3) + 1;
+
+                                document.getElementById('tipoDragon').textContent = type;
+                                document.getElementById('naturalezaDragon').textContent = nature;
+                                document.getElementById('sexoDragon').textContent = gender;
+                                document.getElementById('poderDragon').textContent = power;
+                                document.getElementById('vitalidadDragon').textContent = vitality;
+
+                                dragon.src = dragonImages[type];
+
+                                inventory[currentEggOrDragon.index] = {
+                                    type: 'dragon',
+                                    level: 1,
+                                    rarity: 'Basic',
+                                    type: type,
+                                    nature: nature,
+                                    gender: gender,
+                                    power: power,
+                                    vitality: vitality
+                                };
+                                dragonProgress = 0;
+                                updateDragonProgress();
+                                renderInventory();
+                            });
+                        }, 2000); // Duración de la animación del GIF (2 segundos)
+                    });
+                }, 1000); // Duración de la imagen "CRASH"
+            });
         }
 
         function levelUpUser() {
             userLevel++;
-            clickValue++;
             maxExperience = Math.floor(maxExperience * 1.5);
+
+            const currentTitle = titles.find(title => userLevel === title.level);
+
+            if (currentTitle) {
+                clickValue = currentTitle.clickBonus;
+                titleSpan.textContent = currentTitle.name;
+                titleSpan.style.color = currentTitle.color;
+                updateOrCreateNotification(`New Title: ${currentTitle.name}`, 'title-notification');
+            } else {
+                clickValue++;
+            }
+
             const coinsEarned = getRandomCoins(userLevel);
             coins += coinsEarned;
             updateOrCreateNotification(`<img src="https://i.imgur.com/5MbUxQA.png" alt="Coin"> +${formatCoins(coinsEarned)} Coins`, 'coin-notification');
             updateOrCreateNotification(`You've reached level ${userLevel}!`, 'level-notification');
-
-            if (userLevel % 5 === 0) {
-                const titleIndex = Math.floor((userLevel - 5) / 5);
-                const currentTitle = titles[titleIndex];
-                titleSpan.textContent = currentTitle.name;
-                titleSpan.style.color = currentTitle.color;
-                updateOrCreateNotification(`New Title: ${currentTitle.name}`, 'title-notification');
-            }
 
             updateStats();
         }
@@ -599,7 +784,7 @@
                 if (inventory[i]) {
                     const item = inventory[i];
                     const img = document.createElement('img');
-                    img.src = item.type === 'egg' ? 'https://i.imgur.com/ad6PLfN.png' : 'https://i.imgur.com/XaPR5kU.png';
+                    img.src = item.type === 'egg' ? 'https://i.imgur.com/ad6PLfN.png' : dragonImages[item.type];
                     slot.appendChild(img);
 
                     const label = document.createElement('div');
@@ -630,52 +815,31 @@
             const item = inventory[index];
             if (!item) return;
 
+            currentEggOrDragon = { type: item.type, index };
+
             if (item.type === 'egg') {
-                showEggOptions(index);
+                openModal('eggOptionsModal'); // Abrir modal con opciones
             } else if (item.type === 'dragon') {
-                showDragonOptions(index);
+                openModal('dragonOptionsModal'); // Abrir modal con opciones
             }
         }
 
-        function showEggOptions(index) {
-            const options = [
-                'Incubate', 'Sacrifice', 'NFT Converter', 'Transfer', 'Withdraw'
-            ];
-
-            let selectedOption = prompt(`Options for egg:\n${options.join('\n')}`);
-            if (!selectedOption) return;
-
-            selectedOption = selectedOption.toLowerCase();
-            if (selectedOption === 'incubate') {
-                if (confirm('Are you sure you want to incubate this egg?')) {
-                    incubateEgg(index);
-                }
-            } else if (selectedOption === 'sacrifice') {
-                if (confirm('Are you sure you want to sacrifice this egg for EXP?')) {
-                    sacrificeEgg(index);
-                }
-            } else if (selectedOption === 'nft converter') {
-                alert('Explanation of NFT Converter...');
-            } else if (selectedOption === 'transfer') {
-                const recipient = prompt('Enter the name of the user to whom you want to transfer the egg:');
-                if (recipient && confirm(`Are you sure you want to transfer this egg to ${recipient}?`)) {
-                    alert(`The egg has been transferred to ${recipient}.`);
-                }
-            } else if (selectedOption === 'withdraw') {
-                withdrawEgg(index);
-            }
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('open');
         }
 
-        function showDragonOptions(index) {
-            const options = ['Withdraw'];
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('open');
+        }
 
-            let selectedOption = prompt(`Options for dragon:\n${options.join('\n')}`);
-            if (!selectedOption) return;
+        function confirmIncubate() {
+            incubateEgg(currentEggOrDragon.index);
+            closeModal('incubateModal');
+        }
 
-            selectedOption = selectedOption.toLowerCase();
-            if (selectedOption === 'withdraw') {
-                withdrawDragon(index);
-            }
+        function confirmSacrifice() {
+            sacrificeEgg(currentEggOrDragon.index);
+            closeModal('sacrificeModal');
         }
 
         function incubateEgg(index) {
@@ -685,48 +849,57 @@
             egg.style.display = 'block';
             eggStats.style.display = 'block';
             dragonStats.style.display = 'none';
+            closeModal('incubateModal');
             renderInventory();
         }
 
-        function withdrawEgg(index) {
-            if (currentEggOrDragon?.index === index) {
-                currentEggOrDragon = null;
-                egg.style.display = 'none';
-                dragon.style.display = 'none';
-                eggStats.style.display = 'none';
-                dragonStats.style.display = 'none';
-                renderInventory();
-            }
-        }
+        function withdrawItem(index) {
+            const item = inventory[index];
 
-        function withdrawDragon(index) {
-            if (currentEggOrDragon?.index === index) {
-                currentEggOrDragon = null;
-                egg.style.display = 'none';
-                dragon.style.display = 'none';
-                eggStats.style.display = 'none';
-                dragonStats.style.display = 'none';
-                renderInventory();
+            if (item.type === 'egg') {
+                if (currentEggOrDragon?.index === index) {
+                    currentEggOrDragon = null;
+                    egg.style.display = 'none';
+                    eggStats.style.display = 'none';
+                    renderInventory();
+                }
+            } else if (item.type === 'dragon') {
+                if (currentEggOrDragon?.index === index) {
+                    currentEggOrDragon = null;
+                    dragon.style.display = 'none';
+                    dragonStats.style.display = 'none';
+                    renderInventory();
+                }
             }
+
+            closeModal('withdrawModal');
         }
 
         function sacrificeEgg(index) {
             let expGain = 0;
             if (inventory[index].rarity === 'Basic') expGain = 2500;
             experience += expGain;
+            checkLevelUpAfterSacrifice(expGain);
             inventory.splice(index, 1);
             currentEggOrDragon = null;
             egg.style.display = 'none';
-            dragon.style.display = 'none';
             eggStats.style.display = 'none';
-            dragonStats.style.display = 'none';
             renderInventory();
-            updateStats();
             showNotification(`You gained ${expGain} EXP by sacrificing the egg`, 'exp-notification');
+            closeModal('sacrificeModal');
+        }
+
+        function checkLevelUpAfterSacrifice(expGain) {
+            while (experience >= maxExperience) {
+                experience -= maxExperience;
+                levelUpUser();
+            }
+            updateStats();
         }
 
         function openInventoryModal() {
             inventoryModal.style.display = 'flex';
+            renderInventory(); // Actualiza el inventario cuando se abre el modal
         }
 
         function closeInventoryModal() {
@@ -744,19 +917,36 @@
             clickValueSpan.textContent = clickValue;
             coinsSpan.textContent = formatCoins(coins);
 
-            if (userLevel >= 5) {
-                const titleIndex = Math.floor((userLevel - 5) / 5);
-                const currentTitle = titles[titleIndex] || titles[titles.length - 1];
-                titleSpan.textContent = currentTitle.name;
-                titleSpan.style.color = currentTitle.color;
-            } else {
-                titleSpan.textContent = "None";
-                titleSpan.style.color = "#000";
-            }
+            const currentTitle = titles.find(title => userLevel >= title.level) || { name: "None", color: "#000" };
+            titleSpan.textContent = currentTitle.name;
+            titleSpan.style.color = currentTitle.color;
         }
 
         updateStats();
         renderInventory();
+
+        function showClickEffect(target) {
+            const clickImg = document.createElement('img');
+            clickImg.src = 'https://i.imgur.com/CB9ycnj.png';
+            clickImg.className = 'click-effect';
+
+            // Posición aleatoria alrededor del objetivo
+            const offsetX = Math.random() * 100 - 50; // Rango de -50 a 50
+            const offsetY = Math.random() * 100 - 50; // Rango de -50 a 50
+
+            // Obtener la posición del objetivo
+            const rect = target.getBoundingClientRect();
+
+            clickImg.style.left = `${rect.left + rect.width / 2 + offsetX}px`;
+            clickImg.style.top = `${rect.top + rect.height / 2 + offsetY}px`;
+
+            document.body.appendChild(clickImg);
+
+            // Eliminar el elemento después de la animación
+            setTimeout(() => {
+                clickImg.remove();
+            }, 1000);
+        }
     </script>
 </body>
 
