@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Stats with Dragon Egg</title>
+    <title>Dragon Game Interface</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -19,6 +19,133 @@
             color: #fff;
         }
 
+        #user-stats-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+
+        #egg-dragon-stats-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        .bottom-widget {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .bottom-widget button {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .bottom-widget button:hover {
+            background-color: #e67e22;
+        }
+
+        .bottom-widget button img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .container-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 2px solid #f39c12;
+            padding: 15px;
+            border-radius: 10px;
+            width: 80vw;
+            max-width: 600px;
+            height: 70vh;
+            overflow-y: auto;
+            z-index: 1100;
+        }
+
+        .container-modal h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .container-modal img {
+            width: 50px;
+            margin: 10px;
+        }
+
+        .container-modal button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        #inventory-container img,
+        #fusionadora-container img,
+        #store-container img {
+            width: 10%;
+            border-radius: 10px;
+        }
+
+        .inventory-item,
+        .fusion-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 8px;
+        }
+
+        .inventory-item img,
+        .fusion-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+        }
+
+        .inventory-item button,
+        .fusion-item button {
+            background-color: #f39c12;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .inventory-item button:hover,
+        .fusion-item button:hover {
+            background-color: #e67e22;
+        }
+
         .container {
             position: absolute;
             background-color: rgba(0, 0, 0, 0.8);
@@ -29,31 +156,6 @@
             box-shadow: 0px 0px 20px rgba(243, 156, 18, 0.5);
             word-wrap: break-word;
             overflow: hidden;
-        }
-
-        #user-stats-container {
-            top: 10px;
-            left: 10px;
-        }
-
-        #egg-dragon-stats-container {
-            top: 10px;
-            right: 10px;
-        }
-
-        #huevo,
-        #dragon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: auto;
-            cursor: pointer;
-            image-rendering: pixelated;
-            animation: float 3s ease-in-out infinite;
-            opacity: 1;
-            transition: opacity 1s ease-in-out;
         }
 
         .progress-container {
@@ -94,6 +196,20 @@
             text-overflow: ellipsis;
             position: relative;
             margin-bottom: 15px;
+        }
+
+        .title.marquee {
+            animation: marquee 10s linear infinite;
+        }
+
+        @keyframes marquee {
+            from {
+                left: 100%;
+            }
+
+            to {
+                left: -100%;
+            }
         }
 
         .notification-container {
@@ -157,139 +273,42 @@
 
         @keyframes float {
             0% {
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) scale(1);
             }
 
             50% {
-                transform: translate(-50%, -55%);
+                transform: translate(-50%, -52%) scale(1.05);
             }
 
             100% {
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) scale(1);
             }
         }
 
-        #inventory-button {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            background-color: #555;
-            color: white;
-            border-radius: 5px;
-            box-shadow: 0px 0px 20px rgba(243, 156, 18, 0.5);
-            font-family: 'Press Start 2P', cursive;
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+
+            75% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
         }
 
-        #inventory-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-
-        #inventory-container {
-            background-color: #2c3e50;
-            padding: 20px;
-            border-radius: 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 65px);
-            gap: 10px;
-        }
-
-        .inventory-slot {
-            width: 65px;
-            height: 65px;
-            border: 2px solid #f39c12;
-            background-color: #34495e;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .inventory-slot img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .inventory-slot.occupied img {
-            opacity: 0.5;
-        }
-
-        .slot-label {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            font-size: 12px;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            color: white;
-        }
-
-        .option-button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #ff8c00;
-            border: none;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: center;
-            border-radius: 5px;
-            font-family: 'Press Start 2P', cursive;
-        }
-
-        .option-button:hover {
-            background-color: #ff4500;
-        }
-
-        .modal-content {
-            background-color: #34495e;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-
-        .modal.open {
-            display: flex;
+        .egg-shaking {
+            animation: shake 0.5s ease-in-out infinite;
         }
 
         .click-effect {
@@ -315,10 +334,97 @@
                 transform: scale(0);
             }
         }
+
+        #huevo,
+        #dragon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: auto;
+            cursor: pointer;
+            image-rendering: pixelated;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .level-up-highlight {
+            animation: pulse 1s ease-in-out;
+            color: #f39c12;
+        }
+
+        /* Diferenciación de rarezas */
+        .rarity-basic {
+            background-color: rgba(0, 255, 0, 0.3);
+        }
+
+        .rarity-rare {
+            background-color: rgba(0, 0, 255, 0.3);
+        }
+
+        .rarity-epic {
+            background-color: rgba(128, 0, 128, 0.3);
+        }
+
+        .rarity-legendary {
+            background-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .item-selected {
+            opacity: 0.5;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Widget for Buttons -->
+    <div class="bottom-widget">
+        <!-- Primera fila de botones -->
+        <button onclick="setClickMode('normal')">
+            <img src="https://i.imgur.com/gAnxjF0.png" alt="Manual Mode">
+        </button>
+        <button onclick="setClickMode('free')">
+            <img src="https://i.imgur.com/1cKwQAE.png" alt="Free Mode">
+        </button>
+        <button onclick="setClickMode('premium')">
+            <img src="https://i.imgur.com/0w9s0ae.png" alt="Premium Mode">
+        </button>
+
+        <!-- Segunda fila de botones -->
+        <button onclick="toggleInventory()">
+            <img src="https://i.imgur.com/EcaIYeX.png" alt="Inventory">
+        </button>
+        <button onclick="toggleFusionadora()">
+            <img src="https://i.imgur.com/hYDFrvP.png" alt="Fusionadora">
+        </button>
+        <button onclick="toggleStore()">
+            <img src="https://i.imgur.com/ayrUpBp.png" alt="Store">
+        </button>
+    </div>
+
+    <!-- Modal Containers -->
+    <div id="inventory-container" class="container-modal" style="display: none;">
+        <h2>Inventory</h2>
+        <div id="inventory"></div>
+    </div>
+
+    <div id="fusionadora-container" class="container-modal" style="display: none;">
+        <h2>DNA Fusionadora</h2>
+        <div id="fusionadora"></div>
+    </div>
+
+    <div id="store-container" class="container-modal" style="display: none;">
+        <h2>Store</h2>
+        <div id="store"></div>
+    </div>
+
+    <!-- Egg and Dragon Section -->
+    <img id="huevo" src="https://i.imgur.com/ad6PLfN.png" alt="Dragon Egg">
+    <img id="dragon" src="https://i.imgur.com/XaPR5kU.png" alt="Dragon" style="display:none;">
+    <img id="hatching-gif" src="https://i.imgur.com/m0qlZ0a.gif" alt="Hatching Animation"
+        style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 300px; height: auto;">
+    <img id="crash-effect" src="https://i.imgur.com/5cZw0i6.png" alt="CRASH"
+        style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:200px; z-index: 1000;">
 
     <!-- User Stats Container -->
     <div id="user-stats-container" class="container">
@@ -365,65 +471,28 @@
         </div>
     </div>
 
-    <!-- Egg Image for Interaction -->
-    <img id="huevo" src="https://i.imgur.com/ad6PLfN.png" alt="Dragon Egg">
-    <img id="dragon" src="https://i.imgur.com/XaPR5kU.png" alt="Dragon" style="display:none;">
-    <img id="hatching-gif" src="https://i.imgur.com/m0qlZ0a.gif" alt="Hatching Animation" style="display: none;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1000;width: 300px;height: auto;">
-    <img id="crash-effect" src="https://i.imgur.com/5cZw0i6.png" alt="CRASH"
-        style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:200px; z-index: 1000;">
-
-    <!-- Inventory Button -->
-    <button id="inventory-button">Inventory</button>
-
-    <!-- Inventory Modal -->
-    <div id="inventory-modal">
-        <div id="inventory-container"></div>
-        <span class="modal-close" onclick="closeInventoryModal()">✖</span>
-    </div>
-
-    <!-- Option Modals -->
-    <div id="incubateModal" class="modal">
-        <div class="modal-content">
-            <p>Are you sure you want to incubate this egg?</p>
-            <button onclick="confirmIncubate()">Yes</button>
-            <button onclick="closeModal('incubateModal')">No</button>
-        </div>
-    </div>
-
-    <div id="sacrificeModal" class="modal">
-        <div class="modal-content">
-            <p>Are you sure you want to sacrifice this egg for EXP?</p>
-            <button onclick="confirmSacrifice()">Yes</button>
-            <button onclick="closeModal('sacrificeModal')">No</button>
-        </div>
-    </div>
-
-    <div id="withdrawModal" class="modal">
-        <div class="modal-content">
-            <p>Are you sure you want to withdraw this item from the incubator?</p>
-            <button onclick="withdrawItem(currentEggOrDragon.index)" class="option-button">Yes</button>
-            <button onclick="closeModal('withdrawModal')" class="option-button">No</button>
-        </div>
-    </div>
-
     <!-- Notification Container -->
     <div class="notification-container" id="notificationContainer"></div>
 
     <script>
-        let userLevel = 1;
-        let experience = 0;
-        let maxExperience = 100;
-        let baseClickValue = userLevel; 
-        let clickBonus = 0;
-        let coins = 0;
-        const clickExpBase = 5;
+        const gameState = {
+            userLevel: 1,
+            experience: 0,
+            maxExperience: 100,
+            baseClickValue: 5,
+            clickBonus: 0,
+            coins: 0,
+            eggProgress: 0,
+            eggClicksNeeded: 100,
+            dragonLevel: 1,
+            dragonProgress: 0,
+            dragonClicksNeeded: 100,
+            inventory: [],
+            dragonRarity: 'Basic', // Se añade la rareza del dragón para calcular stats
+        };
 
-        let eggProgress = 0;
-        const eggClicksNeeded = 100;
-
-        let dragonLevel = 1;
-        let dragonProgress = 0;
-        let dragonClicksNeeded = 100;
+        let clickMode = 'normal'; // Modo de click inicial
+        let autoClickInterval = null; // Variable para manejar el intervalo de auto clic
 
         const userLevelSpan = document.getElementById('nivelUsuario');
         const experienceSpan = document.getElementById('experiencia');
@@ -433,242 +502,450 @@
         const bonusClickSpan = document.getElementById('bonusClick');
         const coinsSpan = document.getElementById('monedas');
         const titleSpan = document.getElementById('titulo');
-
         const egg = document.getElementById('huevo');
         const dragon = document.getElementById('dragon');
         const hatchingGif = document.getElementById('hatching-gif');
         const crashEffect = document.getElementById('crash-effect');
         const notificationContainer = document.getElementById('notificationContainer');
-
         const eggStats = document.getElementById('egg-stats');
         const dragonStats = document.getElementById('dragon-stats');
-
         const progressEgg = document.getElementById('progressEgg');
         const progressDragon = document.getElementById('progressDragon');
-
-        const inventoryButton = document.getElementById('inventory-button');
-        const inventoryModal = document.getElementById('inventory-modal');
-        const inventoryContainer = document.getElementById('inventory-container');
-
-        const inventory = [];
-        let currentEggOrDragon = null;
+        const dragonTypeSpan = document.getElementById('tipoDragon');
+        const dragonNatureSpan = document.getElementById('naturalezaDragon');
+        const dragonGenderSpan = document.getElementById('sexoDragon');
+        const dragonPowerSpan = document.getElementById('poderDragon');
+        const dragonVitalitySpan = document.getElementById('vitalidadDragon');
+        const dragonLevelSpan = document.getElementById('nivelDragon');
 
         const titles = [
-            { name: "Recruit Breeder", level: 5, clickBonus: 5, color: "hsl(0, 100%, 50%)" },
-            { name: "Young Tamer", level: 10, clickBonus: 10, color: "hsl(7, 100%, 50%)" },
-            { name: "Wyrmling Keeper", level: 15, clickBonus: 15, color: "hsl(14, 100%, 50%)" },
-            { name: "Scale Squire", level: 20, clickBonus: 20, color: "hsl(21, 100%, 50%)" },
-            { name: "Flame Tamer", level: 25, clickBonus: 25, color: "hsl(28, 100%, 50%)" },
-            { name: "Dragon Rider", level: 30, clickBonus: 30, color: "hsl(35, 100%, 50%)" },
-            { name: "Breeder Adept", level: 35, clickBonus: 35, color: "hsl(42, 100%, 50%)" },
-            { name: "Sky Guardian", level: 40, clickBonus: 40, color: "hsl(49, 100%, 50%)" },
-            { name: "Scale Connoisseur", level: 45, clickBonus: 45, color: "hsl(56, 100%, 50%)" },
-            { name: "Lore Seeker", level: 50, clickBonus: 50, color: "hsl(63, 100%, 50%)" },
-            { name: "Wyrm Breeder", level: 55, clickBonus: 55, color: "hsl(70, 100%, 50%)" },
-            { name: "Elder Keeper", level: 60, clickBonus: 60, color: "hsl(77, 100%, 50%)" },
-            { name: "Drake Seer", level: 65, clickBonus: 65, color: "hsl(84, 100%, 50%)" },
-            { name: "Dragon Master", level: 70, clickBonus: 70, color: "hsl(91, 100%, 50%)" },
-            { name: "Wyrm Warden", level: 75, clickBonus: 75, color: "hsl(98, 100%, 50%)" },
-            { name: "Storm Lord", level: 80, clickBonus: 80, color: "hsl(105, 100%, 50%)" },
-            { name: "Fire Warden", level: 85, clickBonus: 85, color: "hsl(112, 100%, 50%)" },
-            { name: "Celestial Rider", level: 90, clickBonus: 90, color: "hsl(119, 100%, 50%)" },
-            { name: "Dragon Lord", level: 95, clickBonus: 95, color: "hsl(126, 100%, 50%)" },
-            { name: "Master of Dragons", level: 100, clickBonus: 100, color: "hsl(133, 100%, 50%)" }
+            { name: "Recruit Breeder", level: 5, clickBonus: 1, coinBonus: 5, expBonus: 50, color: "hsl(0, 100%, 50%)" },
+            { name: "Young Tamer", level: 10, clickBonus: 2, coinBonus: 10, expBonus: 100, color: "hsl(7, 100%, 50%)" },
+            { name: "Wyrmling Keeper", level: 15, clickBonus: 4, coinBonus: 15, expBonus: 150, color: "hsl(14, 100%, 50%)" },
+            { name: "Scale Squire", level: 20, clickBonus: 8, coinBonus: 20, expBonus: 200, color: "hsl(21, 100%, 50%)" },
+            { name: "Flame Tamer", level: 25, clickBonus: 16, coinBonus: 25, expBonus: 250, color: "hsl(28, 100%, 50%)" },
+            { name: "Dragon Rider", level: 30, clickBonus: 32, coinBonus: 30, expBonus: 300, color: "hsl(35, 100%, 50%)" },
+            { name: "Breeder Adept", level: 35, clickBonus: 64, coinBonus: 35, expBonus: 350, color: "hsl(42, 100%, 50%)" },
+            { name: "Sky Guardian", level: 40, clickBonus: 128, coinBonus: 40, expBonus: 400, color: "hsl(49, 100%, 50%)" },
+            { name: "Scale Connoisseur", level: 45, clickBonus: 256, coinBonus: 45, expBonus: 450, color: "hsl(56, 100%, 50%)" },
+            { name: "Lore Seeker", level: 50, clickBonus: 512, coinBonus: 50, expBonus: 500, color: "hsl(63, 100%, 50%)" },
+            { name: "Wyrm Breeder", level: 55, clickBonus: 1024, coinBonus: 55, expBonus: 550, color: "hsl(70, 100%, 50%)" },
+            { name: "Elder Keeper", level: 60, clickBonus: 2048, coinBonus: 60, expBonus: 600, color: "hsl(77, 100%, 50%)" },
+            { name: "Drake Seer", level: 65, clickBonus: 3096, coinBonus: 65, expBonus: 650, color: "hsl(84, 100%, 50%)" },
+            { name: "Dragon Master", level: 70, clickBonus: 4192, coinBonus: 70, expBonus: 700, color: "hsl(91, 100%, 50%)" },
+            { name: "Wyrm Warden", level: 75, clickBonus: 5384, coinBonus: 75, expBonus: 750, color: "hsl(98, 100%, 50%)" },
+            { name: "Storm Lord", level: 80, clickBonus: 6768, coinBonus: 80, expBonus: 800, color: "hsl(105, 100%, 50%)" },
+            { name: "Fire Warden", level: 85, clickBonus: 7536, coinBonus: 85, expBonus: 850, color: "hsl(112, 100%, 50%)" },
+            { name: "Celestial Rider", level: 90, clickBonus: 8072, coinBonus: 90, expBonus: 900, color: "hsl(119, 100%, 50%)" },
+            { name: "Dragon Lord", level: 95, clickBonus: 9144, coinBonus: 95, expBonus: 950, color: "hsl(126, 100%, 50%)" },
+            { name: "Master of Dragons", level: 100, clickBonus: 10288, coinBonus: 100, expBonus: 1000, color: "hsl(133, 100%, 50%)" }
         ];
 
-        const types = ["Flama", "Electro", "Freez", "Wind"];
+        const types = ["Flama", "Freez", "Wind", "Electro"];
         const natures = ["Malignant", "Divine"];
         const genders = ["Male", "Female"];
 
+        const eggInventory = [
+            { rarity: 'Basic', image: 'https://i.imgur.com/ad6PLfN.png', price: 50 },
+            { rarity: 'Rare', image: 'https://i.imgur.com/epK4353.png', price: 150 },
+            { rarity: 'Epic', image: 'https://i.imgur.com/GFkWuBh.png', price: 300 },
+            { rarity: 'Legendary', image: 'https://i.imgur.com/JaX0DeS.png', price: 600 },
+        ];
+
         const dragonImages = {
-            "Flama": "https://i.imgur.com/S0qMZRp.png",
-            "Electro": "https://i.imgur.com/L6PVNVJ.png",
-            "Freez": "https://i.imgur.com/pdwYzy6.png",
-            "Wind": "https://i.imgur.com/XaPR5kU.png"
+            "Basic": {
+                "Electro": "https://i.imgur.com/L6PVNVJ.png",
+                "Freez": "https://i.imgur.com/pdwYzy6.png",
+                "Flama": "https://i.imgur.com/S0qMZRp.png",
+                "Wind": "https://i.imgur.com/XaPR5kU.png"
+            },
+            "Rare": {
+                "Electro": "https://i.imgur.com/hCrZFzc.png",
+                "Freez": "https://i.imgur.com/dISqSyv.png",
+                "Flama": "https://i.imgur.com/qshSbMW.png",
+                "Wind": "https://i.imgur.com/dISqSyv.png"
+            },
+            "Epic": {
+                "Electro": "https://i.imgur.com/yb6lvBA.png",
+                "Freez": "https://i.imgur.com/EGLCn5f.png",
+                "Flama": "https://i.imgur.com/3hRx9r2.png",
+                "Wind": "https://i.imgur.com/UYea4dz.png"
+            },
+            "Legendary": {
+                "Electro": "https://i.imgur.com/0fljAZ0.png",
+                "Freez": "https://i.imgur.com/GOYeIkg.png",
+                "Flama": "https://i.imgur.com/GOYeIkg.png",
+                "Wind": "https://i.imgur.com/iWYOAz4.png"
+            }
         };
 
-        inventory.push({ type: 'egg', progress: 0, rarity: 'Basic' });
-
         egg.addEventListener('click', () => {
-            const expPerClick = clickExpBase + (userLevel - 1);
-            experience += expPerClick;
+            handleClickEvent();
+        });
 
-            eggProgress += baseClickValue + clickBonus;
+        dragon.addEventListener('click', () => {
+            handleClickEvent(true);
+        });
 
-            showNotification(`+${expPerClick} EXP`, 'exp-notification');
-            showClickEffect(egg);
+        function handleClickEvent(isDragon = false) {
+            const clickValue = calculateClickValue();
+            const expPerClick = clickValue + gameState.clickBonus;
 
-            if (experience >= maxExperience) {
-                experience -= maxExperience;
+            updateExperience(expPerClick);
+            if (!isDragon) {
+                handleEggClick(clickValue);
+            } else {
+                handleDragonClick(clickValue);
+            }
+            updateStats();
+        }
+
+        function calculateClickValue() {
+            let baseValue = gameState.baseClickValue;
+            switch (gameState.dragonRarity) {
+                case 'Rare':
+                    baseValue += 3;
+                    break;
+                case 'Epic':
+                    baseValue += 5;
+                    break;
+                case 'Legendary':
+                    baseValue += 10;
+                    break;
+            }
+            return clickMode === 'free' ? Math.floor(baseValue * 0.5) : clickMode === 'premium' ? baseValue * 2 : baseValue;
+        }
+
+        function updateExperience(expGained) {
+            gameState.experience += expGained;
+            showNotification(`+${expGained} EXP`, 'exp-notification');
+
+            if (gameState.experience >= gameState.maxExperience) {
+                gameState.experience -= gameState.maxExperience;
                 levelUpUser();
             }
+        }
 
-            if (eggProgress >= eggClicksNeeded) {
+        function levelUpUser() {
+            gameState.userLevel++;
+            gameState.baseClickValue++;
+            gameState.maxExperience = Math.floor(gameState.maxExperience * 1.5);
+            const coinsEarned = calculateCoinsEarned();
+            gameState.coins += coinsEarned;
+
+            showNotification(`+${coinsEarned} Coins`, 'coin-notification');
+            showNotification(`You've reached level ${gameState.userLevel}!`, 'level-notification');
+        }
+
+        function calculateCoinsEarned() {
+            let coins = Math.floor(Math.random() * 4) + gameState.userLevel;
+            switch (gameState.dragonRarity) {
+                case 'Rare':
+                    return Math.floor(coins * 1.5);
+                case 'Epic':
+                    return Math.floor(coins * 2);
+                case 'Legendary':
+                    return Math.floor(coins * 4);
+                default:
+                    return coins;
+            }
+        }
+
+        function handleEggClick(clickValue) {
+            gameState.eggProgress += clickValue;
+            if (gameState.eggProgress >= gameState.eggClicksNeeded) {
+                gameState.eggProgress = gameState.eggClicksNeeded;
                 hatchEgg();
             } else {
                 updateEggProgress();
             }
+        }
 
-            updateStats();
-        });
-
-        dragon.addEventListener('click', () => {
-            const expPerClick = clickExpBase + (userLevel - 1);
-            experience += expPerClick;
-
-            dragonProgress += baseClickValue + clickBonus;
-
-            showNotification(`+${expPerClick} EXP`, 'exp-notification');
-            showClickEffect(dragon);
-
-            if (experience >= maxExperience) {
-                experience -= maxExperience;
-                levelUpUser();
-            }
-
-            if (dragonProgress >= dragonClicksNeeded) {
+        function handleDragonClick(clickValue) {
+            gameState.dragonProgress += clickValue;
+            if (gameState.dragonProgress >= gameState.dragonClicksNeeded) {
+                gameState.dragonProgress = gameState.dragonClicksNeeded;
                 levelUpDragon();
             } else {
                 updateDragonProgress();
             }
-
-            updateStats();
-        });
-
-        function updateEggProgress() {
-            const percentage = (eggProgress / eggClicksNeeded) * 100;
-            progressEgg.style.width = `${percentage}%`;
-            progressEgg.textContent = `${Math.round(percentage)}%`;
-
-            if (inventory[currentEggOrDragon?.index]?.type === 'egg') {
-                inventory[currentEggOrDragon.index].progress = Math.round(percentage);
-                renderInventory();
-            }
-
-            if (percentage >= 25 && percentage < 50) {
-                showNotification("The egg is cracking!", 'egg-notification');
-            } else if (percentage >= 50 && percentage < 75) {
-                showNotification("The egg is almost ready!", 'egg-notification');
-            } else if (percentage >= 75 && percentage < 100) {
-                showNotification("This egg is about to hatch!", 'egg-notification');
-            }
-        }
-
-        function updateDragonProgress() {
-            const percentage = (dragonProgress / dragonClicksNeeded) * 100;
-            progressDragon.style.width = `${percentage}%`;
-            progressDragon.textContent = `${Math.round(percentage)}%`;
         }
 
         function hatchEgg() {
+            clearInterval(autoClickInterval);
+            egg.style.display = 'none';
+            fadeIn(crashEffect, 500);
+
+            setTimeout(() => {
+                fadeOut(crashEffect, 500);
+                fadeIn(hatchingGif, 500);
+
+                setTimeout(() => {
+                    fadeOut(hatchingGif, 500);
+
+                    const lastEgg = gameState.inventory.length > 0 ? gameState.inventory[gameState.inventory.length - 1] : { rarity: 'Basic' };
+                    const rarity = lastEgg.rarity;
+                    const dragonAttributes = generateDragonAttributes(rarity);
+
+                    displayDragon(dragonAttributes);
+                    showNotification("Congratulations! Your egg has hatched!", 'egg-notification');
+                    autoClickHandler();
+                }, 2000);
+            }, 1000);
+        }
+
+        function generateDragonAttributes(rarity) {
             const type = types[Math.floor(Math.random() * types.length)];
             const nature = natures[Math.floor(Math.random() * natures.length)];
             const gender = genders[Math.floor(Math.random() * genders.length)];
             const power = Math.floor(Math.random() * 3) + 1;
             const vitality = Math.floor(Math.random() * 3) + 1;
 
-            document.getElementById('tipoDragon').textContent = type;
-            document.getElementById('naturalezaDragon').textContent = nature;
-            document.getElementById('sexoDragon').textContent = gender;
-            document.getElementById('poderDragon').textContent = power;
-            document.getElementById('vitalidadDragon').textContent = vitality;
+            gameState.dragonRarity = rarity;
 
-            dragon.src = dragonImages[type];
-
-            fadeOut(egg, 1000, () => {
-                egg.style.display = 'none';
-                fadeIn(crashEffect, 1000, () => {
-                    setTimeout(() => {
-                        fadeOut(crashEffect, 1000, () => {
-                            crashEffect.style.display = 'none';
-                            fadeIn(hatchingGif, 1000, () => {
-                                setTimeout(() => {
-                                    fadeOut(hatchingGif, 1000, () => {
-                                        hatchingGif.style.display = 'none';
-                                        fadeIn(dragon, 1000, () => {
-                                            eggStats.style.display = 'none';
-                                            dragonStats.style.display = 'block';
-
-                                            document.querySelector("#egg-dragon-stats-container h2").textContent = "Dragon Stats";
-
-                                            inventory[currentEggOrDragon.index] = {
-                                                type: 'dragon',
-                                                level: 1,
-                                                rarity: 'Basic',
-                                                type: type,
-                                                nature: nature,
-                                                gender: gender,
-                                                power: power,
-                                                vitality: vitality
-                                            };
-                                            dragonProgress = 0;
-                                            updateDragonProgress();
-                                            renderInventory();
-                                        });
-                                    });
-                                }, 2000); // Duración de la animación del GIF (2 segundos)
-                            });
-                        });
-                    }, 1000); // Duración de la imagen "CRASH"
-                });
-            });
+            return { type, nature, gender, power, vitality };
         }
 
-        function fadeOut(element, duration, callback) {
-            element.style.transition = `opacity ${duration}ms ease-in-out`;
-            element.style.opacity = 0;
-            setTimeout(callback, duration);
-        }
+        function displayDragon({ type, nature, gender, power, vitality }) {
+            dragon.src = dragonImages[gameState.dragonRarity][type];
+            dragonTypeSpan.textContent = type;
+            dragonNatureSpan.textContent = nature;
+            dragonGenderSpan.textContent = gender;
+            dragonPowerSpan.textContent = power;
+            dragonVitalitySpan.textContent = vitality;
 
-        function fadeIn(element, duration, callback) {
-            element.style.display = 'block';
-            element.style.transition = `opacity ${duration}ms ease-in-out`;
-            element.style.opacity = 1;
-            setTimeout(callback, duration);
-        }
+            document.querySelector('#egg-dragon-stats-container h2').textContent = "Dragon Stats";
 
-        function levelUpUser() {
-            userLevel++;
-            baseClickValue = userLevel;
-            maxExperience = Math.floor(maxExperience * 1.5);
-            const coinsEarned = getRandomCoins(userLevel);
-            coins += coinsEarned;
-            updateOrCreateNotification(`<img src="https://i.imgur.com/5MbUxQA.png" alt="Coin"> +${formatCoins(coinsEarned)} Coins`, 'coin-notification');
-            updateOrCreateNotification(`You've reached level ${userLevel}!`, 'level-notification');
+            dragon.style.pointerEvents = 'auto';
+            dragon.style.display = 'block';
+            eggStats.style.display = 'none';
+            dragonStats.style.display = 'block';
 
-            checkForTitleUpgrade();
-            updateStats();
-        }
-
-        function checkForTitleUpgrade() {
-            const currentTitle = titles.find(title => userLevel >= title.level);
-            if (currentTitle) {
-                titleSpan.textContent = currentTitle.name;
-                titleSpan.style.color = currentTitle.color;
-                clickBonus = currentTitle.clickBonus;
-                updateOrCreateNotification(`New Title: ${currentTitle.name}`, 'title-notification');
-            }
+            gameState.dragonProgress = 0;
+            updateDragonProgress();
         }
 
         function levelUpDragon() {
-            dragonLevel++;
-            dragonProgress = 0;
-            dragonClicksNeeded = Math.floor(dragonClicksNeeded * 1.25);
+            gameState.dragonLevel++;
+            gameState.dragonProgress = 0;
+            gameState.dragonClicksNeeded = Math.floor(gameState.dragonClicksNeeded * 1.2);
 
-            const dragonPower = document.getElementById('poderDragon');
-            const dragonVitality = document.getElementById('vitalidadDragon');
-            dragonPower.textContent = parseInt(dragonPower.textContent) + 1;
-            dragonVitality.textContent = parseInt(dragonVitality.textContent) + 1;
+            dragonPowerSpan.textContent = parseInt(dragonPowerSpan.textContent) + 1;
+            dragonVitalitySpan.textContent = parseInt(dragonVitalitySpan.textContent) + 1;
+            dragonLevelSpan.textContent = gameState.dragonLevel;
 
-            document.getElementById('nivelDragon').textContent = dragonLevel;
-            showNotification(`Your dragon has reached level ${dragonLevel}!`, 'title-notification');
+            updateDragonProgress();
+            showNotification(`Your dragon leveled up to ${gameState.dragonLevel}!`, 'level-notification');
+        }
 
-            inventory[currentEggOrDragon.index].level = dragonLevel;
+        function updateEggProgress() {
+            const percentage = (gameState.eggProgress / gameState.eggClicksNeeded) * 100;
+            progressEgg.style.width = `${percentage}%`;
+            progressEgg.textContent = `${Math.round(percentage)}%`;
+
+            if (percentage >= 25 && percentage < 50) {
+                egg.classList.add('egg-shaking');
+                showNotification("Has that egg moved?", 'egg-notification');
+            } else if (percentage >= 50 && percentage < 75) {
+                egg.classList.add('egg-shaking');
+                showNotification("Hey! That egg is vibrating!", 'egg-notification');
+            } else if (percentage >= 75 && porcentaje < 100) {
+                egg.classList.add('egg-shaking');
+                showNotification("This egg is already about to break...", 'egg-notification');
+            } else if (percentage >= 100) {
+                egg.classList.remove('egg-shaking');
+                showNotification("Congratulations! Your egg has hatched!", 'egg-notification');
+            }
+        }
+
+        function updateDragonProgress() {
+            const percentage = (gameState.dragonProgress / gameState.dragonClicksNeeded) * 100;
+            progressDragon.style.width = `${percentage}%`;
+            progressDragon.textContent = `${Math.round(percentage)}%`;
+        }
+
+        function updateStats() {
+            userLevelSpan.textContent = gameState.userLevel;
+            experienceSpan.textContent = gameState.experience;
+            maxExperienceSpan.textContent = gameState.maxExperience;
+            progressExp.style.width = (gameState.experience / gameState.maxExperience) * 100 + '%';
+            progressExp.textContent = `${Math.round((gameState.experience / gameState.maxExperience) * 100)}%`;
+            clickValueSpan.textContent = gameState.baseClickValue;
+            bonusClickSpan.textContent = gameState.clickBonus ? ` + ${gameState.clickBonus}` : '';
+            coinsSpan.textContent = formatCoins(gameState.coins);
+
+            if (gameState.userLevel < 5) {
+                titleSpan.textContent = "None";
+                titleSpan.style.color = "#000";
+                bonusClickSpan.textContent = '';
+            }
+        }
+
+        function setClickMode(mode) {
+            clearInterval(autoClickInterval);
+            clickMode = mode;
+            let notificationMessage = '';
+
+            if (mode === 'free') {
+                notificationMessage = 'AutoClick Free Mode Activated! (-50% Click Value)';
+                autoClickInterval = setInterval(() => {
+                    if (dragon.style.display === 'none') {
+                        handleClickEvent(false);
+                    } else {
+                        handleClickEvent(true);
+                    }
+                }, 1000 / 3);
+            } else if (mode === 'premium') {
+                notificationMessage = 'AutoClick Premium Mode Activated! (x2 Click Value)';
+                autoClickInterval = setInterval(() => {
+                    if (dragon.style.display !== 'none') {
+                        handleClickEvent(true);
+                    } else {
+                        handleClickEvent(false);
+                    }
+                }, 1000 / 73);
+            } else {
+                notificationMessage = 'Manual Click Mode Activated!';
+            }
+
+            showNotification(notificationMessage, 'click-mode-notification');
+        }
+
+        function autoClickHandler() {
+            if (clickMode === 'free' || clickMode === 'premium') {
+                setClickMode(clickMode);
+            }
+        }
+
+        function toggleInventory() {
+            const inventoryContainer = document.getElementById('inventory-container');
+            inventoryContainer.style.display = inventoryContainer.style.display === 'none' ? 'block' : 'none';
             renderInventory();
         }
 
-        function getRandomCoins(level) {
-            return Math.floor(Math.random() * 3) + level;
+        function toggleFusionadora() {
+            const fusionadoraContainer = document.getElementById('fusionadora-container');
+            fusionadoraContainer.style.display = fusionadoraContainer.style.display === 'none' ? 'block' : 'none';
+            renderFusionadora();
+        }
+
+        function toggleStore() {
+            const storeContainer = document.getElementById('store-container');
+            storeContainer.style.display = storeContainer.style.display === 'none' ? 'block' : 'none';
+            renderStore();
+        }
+
+        function renderInventory() {
+            const inventoryDiv = document.getElementById('inventory');
+            inventoryDiv.innerHTML = '';
+
+            if (gameState.inventory.length === 0) {
+                inventoryDiv.innerHTML = '<p>No eggs in inventory.</p>';
+                return;
+            }
+
+            gameState.inventory.forEach(item => {
+                const inventoryItem = document.createElement('div');
+                inventoryItem.className = `inventory-item rarity-${item.rarity.toLowerCase()}`;
+                inventoryItem.style.opacity = item === gameState.inventory[gameState.inventory.length - 1] ? '0.5' : '1';
+                inventoryItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.rarity} Egg">
+                    <span>${item.rarity} Egg</span>
+                    <button onclick="selectItem('${item.rarity}', '${item.image}')">Select</button>
+                    <button onclick="viewDetails('${item.rarity}', '${item.image}')">Details</button>
+                    <button onclick="fuseEggs('${item.rarity}')">Fuse</button>
+                `;
+                inventoryDiv.appendChild(inventoryItem);
+            });
+        }
+
+        function renderFusionadora() {
+            const fusionadoraDiv = document.getElementById('fusionadora');
+            fusionadoraDiv.innerHTML = '';
+
+            const fusionRecipes = [
+                { input: 'Basic', output: 'Rare' },
+                { input: 'Rare', output: 'Epic' },
+                { input: 'Epic', output: 'Legendary' },
+            ];
+
+            fusionRecipes.forEach(recipe => {
+                const inputImage = eggInventory.find(egg => egg.rarity === recipe.input).image;
+                const outputImage = eggInventory.find(egg => egg.rarity === recipe.output).image;
+                const fusionItem = document.createElement('div');
+                fusionItem.className = 'fusion-item';
+                fusionItem.innerHTML = `
+                    <span><img src="${inputImage}" alt="${recipe.input} Egg" style="width:30px;"> x3 = <img src="${outputImage}" alt="${recipe.output} Egg" style="width:30px;"> x1</span>
+                    <button onclick="fuseEggs('${recipe.input}')">Fuse</button>
+                `;
+                fusionadoraDiv.appendChild(fusionItem);
+            });
+        }
+
+        function renderStore() {
+            const storeDiv = document.getElementById('store');
+            storeDiv.innerHTML = '';
+
+            eggInventory.forEach(item => {
+                const storeItem = document.createElement('div');
+                storeItem.className = `inventory-item rarity-${item.rarity.toLowerCase()}`;
+                storeItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.rarity} Egg">
+                    <span>${item.rarity} Egg - ${item.price} coins</span>
+                    <button style="width: 80px;" onclick="buyEgg('${item.rarity}', '${item.image}', ${item.price})">Buy</button>
+                `;
+                storeDiv.appendChild(storeItem);
+            });
+        }
+
+        function buyEgg(rarity, image, price) {
+            if (gameState.coins >= price) {
+                gameState.coins -= price;
+                gameState.inventory.push({ rarity, image });
+                updateStats();
+                renderInventory();
+                showNotification(`Purchased ${rarity} Egg!`, 'coin-notification');
+            } else {
+                showNotification(`Not enough coins to buy ${rarity} Egg.`, 'coin-notification');
+            }
+        }
+
+        function fuseEggs(rarity) {
+            const requiredEggs = gameState.inventory.filter(egg => egg.rarity === rarity);
+
+            if (requiredEggs.length >= 3) {
+                gameState.inventory.splice(gameState.inventory.indexOf(requiredEggs[0]), 3);
+                const newRarity = getNextRarity(rarity);
+                const newEgg = eggInventory.find(egg => egg.rarity === newRarity);
+                gameState.inventory.push({ rarity: newEgg.rarity, image: newEgg.image });
+                renderInventory();
+                showNotification(`Fused to create a ${newRarity} Egg!`, 'coin-notification');
+            } else {
+                showNotification(`Not enough ${rarity} Eggs to fuse.`, 'coin-notification');
+            }
+        }
+
+        function selectItem(rarity, image) {
+            // Lógica para seleccionar el ítem para eclosionar o subir de nivel
+            console.log(`Selected ${rarity} item.`);
+        }
+
+        function viewDetails(rarity, image) {
+            // Lógica para ver detalles del ítem
+            console.log(`Viewing details for ${rarity} item.`);
+        }
+
+        function getNextRarity(currentRarity) {
+            switch (currentRarity) {
+                case 'Basic':
+                    return 'Rare';
+                case 'Rare':
+                    return 'Epic';
+                case 'Epic':
+                    return 'Legendary';
+                default:
+                    return 'Basic';
+            }
         }
 
         function formatCoins(value) {
@@ -713,181 +990,6 @@
             }
         }
 
-        function updateOrCreateNotification(message, className) {
-            const existingNotification = document.querySelector(`.${className}`);
-            if (existingNotification) {
-                existingNotification.innerHTML = message;
-                existingNotification.style.opacity = '1';
-                clearTimeout(existingNotification.timeout);
-                existingNotification.timeout = setTimeout(() => {
-                    existingNotification.style.opacity = '0';
-                    setTimeout(() => {
-                        existingNotification.remove();
-                    }, 1000);
-                }, 3000);
-            } else {
-                const notification = document.createElement('div');
-                notification.className = `notification ${className}`;
-                notification.innerHTML = message;
-                notificationContainer.appendChild(notification);
-
-                notification.style.opacity = '1';
-
-                notification.timeout = setTimeout(() => {
-                    notification.style.opacity = '0';
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 1000);
-                }, 3000);
-            }
-        }
-
-        function renderInventory() {
-            inventoryContainer.innerHTML = '';
-
-            for (let i = 0; i < 20; i++) {
-                const slot = document.createElement('div');
-                slot.className = 'inventory-slot';
-
-                if (inventory[i]) {
-                    const item = inventory[i];
-                    const img = document.createElement('img');
-                    img.src = item.type === 'egg' ? 'https://i.imgur.com/ad6PLfN.png' : dragonImages[item.type];
-                    slot.appendChild(img);
-
-                    const label = document.createElement('div');
-                    label.className = 'slot-label';
-
-                    if (item.type === 'egg') {
-                        label.textContent = `${item.progress}%`;
-                        if (i === currentEggOrDragon?.index) {
-                            img.style.opacity = 0.5;
-                        }
-                    } else if (item.type === 'dragon') {
-                        label.textContent = `Lv. ${item.level}`;
-                        if (i === currentEggOrDragon?.index) {
-                            img.style.opacity = 0.5;
-                        }
-                    }
-
-                    slot.appendChild(label);
-                    slot.classList.add('occupied');
-                    slot.addEventListener('click', () => selectInventoryItem(i));
-                }
-
-                inventoryContainer.appendChild(slot);
-            }
-        }
-
-        function selectInventoryItem(index) {
-            const item = inventory[index];
-            if (!item) return;
-
-            currentEggOrDragon = { type: item.type, index };
-
-            if (item.type === 'egg') {
-                openModal('eggOptionsModal');
-            } else if (item.type === 'dragon') {
-                openModal('dragonOptionsModal');
-            }
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('open');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('open');
-        }
-
-        function confirmIncubate() {
-            incubateEgg(currentEggOrDragon.index);
-            closeModal('incubateModal');
-        }
-
-        function confirmSacrifice() {
-            sacrificeEgg(currentEggOrDragon.index);
-            closeModal('sacrificeModal');
-        }
-
-        function incubateEgg(index) {
-            currentEggOrDragon = { type: 'egg', index };
-            eggProgress = inventory[index].progress;
-            dragon.style.display = 'none';
-            egg.style.display = 'block';
-            eggStats.style.display = 'block';
-            dragonStats.style.display = 'none';
-            closeModal('incubateModal');
-            renderInventory();
-        }
-
-        function withdrawItem(index) {
-            const item = inventory[index];
-
-            if (item.type === 'egg') {
-                if (currentEggOrDragon?.index === index) {
-                    currentEggOrDragon = null;
-                    egg.style.display = 'none';
-                    eggStats.style.display = 'none';
-                    renderInventory();
-                }
-            } else if (item.type === 'dragon') {
-                if (currentEggOrDragon?.index === index) {
-                    currentEggOrDragon = null;
-                    dragon.style.display = 'none';
-                    dragonStats.style.display = 'none';
-                    renderInventory();
-                }
-            }
-
-            closeModal('withdrawModal');
-        }
-
-        function sacrificeEgg(index) {
-            let expGain = 0;
-            if (inventory[index].rarity === 'Basic') expGain = 2500;
-            experience += expGain;
-            checkLevelUpAfterSacrifice(expGain);
-            inventory.splice(index, 1);
-            currentEggOrDragon = null;
-            egg.style.display = 'none';
-            eggStats.style.display = 'none';
-            renderInventory();
-            showNotification(`You gained ${expGain} EXP by sacrificing the egg`, 'exp-notification');
-            closeModal('sacrificeModal');
-        }
-
-        function checkLevelUpAfterSacrifice(expGain) {
-            while (experience >= maxExperience) {
-                experience -= maxExperience;
-                levelUpUser();
-            }
-            updateStats();
-        }
-
-        function openInventoryModal() {
-            inventoryModal.style.display = 'flex';
-            renderInventory();
-        }
-
-        function closeInventoryModal() {
-            inventoryModal.style.display = 'none';
-        }
-
-        inventoryButton.addEventListener('click', openInventoryModal);
-
-        function updateStats() {
-            userLevelSpan.textContent = userLevel;
-            experienceSpan.textContent = experience;
-            maxExperienceSpan.textContent = maxExperience;
-            progressExp.style.width = (experience / maxExperience) * 100 + '%';
-            progressExp.textContent = `${Math.round((experience / maxExperience) * 100)}%`;
-            clickValueSpan.textContent = baseClickValue;
-            bonusClickSpan.textContent = clickBonus ? ` + ${clickBonus}` : '';
-            bonusClickSpan.style.color = titleSpan.style.color;
-            coinsSpan.textContent = formatCoins(coins);
-        }
-
         function showClickEffect(target) {
             const clickImg = document.createElement('img');
             clickImg.src = 'https://i.imgur.com/CB9ycnj.png';
@@ -895,6 +997,7 @@
 
             const offsetX = Math.random() * 100 - 50;
             const offsetY = Math.random() * 100 - 50;
+
             const rect = target.getBoundingClientRect();
 
             clickImg.style.left = `${rect.left + rect.width / 2 + offsetX}px`;
@@ -907,8 +1010,40 @@
             }, 1000);
         }
 
+        function fadeIn(element, duration) {
+            element.style.opacity = 0;
+            element.style.display = 'block';
+
+            let last = +new Date();
+            const tick = function () {
+                element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
+                last = +new Date();
+
+                if (+element.style.opacity < 1) {
+                    (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+                }
+            };
+            tick();
+        }
+
+        function fadeOut(element, duration) {
+            element.style.opacity = 1;
+
+            let last = +new Date();
+            const tick = function () {
+                element.style.opacity = +element.style.opacity - (new Date() - last) / duration;
+                last = +new Date();
+
+                if (+element.style.opacity > 0) {
+                    (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+                } else {
+                    element.style.display = 'none';
+                }
+            };
+            tick();
+        }
+
         updateStats();
-        renderInventory();
     </script>
 </body>
 
